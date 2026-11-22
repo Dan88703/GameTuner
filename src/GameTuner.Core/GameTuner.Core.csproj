@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>GameTuner.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WMI: CPU / GPU / RAM / disk / battery -->
+    <PackageReference Include="System.Management" Version="10.0.*" />
+    <!-- "GPU Engine" performance counters: GPU load without admin rights -->
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="10.0.*" />
+    <!-- Temperatures, clocks, loads (needs admin) -->
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="GameTuner.Core.Tests" />
+  </ItemGroup>
+
+</Project>

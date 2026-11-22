@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="GameTuner.App.Views.OptimizationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:GameTuner.App.ViewModels">
+
+    <ScrollViewer>
+        <StackPanel Padding="32,24,32,32" Spacing="16" MaxWidth="1200">
+
+            <TextBlock Text="Оптимизация" Style="{StaticResource PageTitleStyle}" />
+
+            <!-- Manual boost -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Игровой режим вручную" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}"
+                               Text="Максимальная производительность питания + Game Mode. Обычно это делает авто-режим сам при запуске игры; кнопка — для игр, которых GameTuner не знает." />
+                    <TextBlock>
+                        <Run Text="Схема питания сейчас: " />
+                        <Run Text="{x:Bind ViewModel.PowerPlan, Mode=OneWay}" FontWeight="SemiBold" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Включить максимум" Style="{StaticResource AccentButtonStyle}"
+                                Command="{x:Bind ViewModel.BoostCommand}" />
+                        <Button Content="Вернуть как было" Command="{x:Bind ViewModel.RestorePowerCommand}" />
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind ViewModel.LastAction, Mode=OneWay}" Style="{StaticResource TileCaptionStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <!-- Windows switches -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Настройки Windows" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <ToggleSwitch Header="Игровой режим Windows (Game Mode)"
+                                  IsOn="{x:Bind ViewModel.GameModeEnabled, Mode=TwoWay}" />
+                    <TextBlock Text="{x:Bind ViewModel.GpuSchedulingText, Mode=OneWay}" TextWrapping="Wrap"
+                               Style="{StaticResource TileCaptionStyle}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Background apps -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="10">
+                    <Grid>
+                        <TextBlock Text="Тяжёлые фоновые программы" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <ProgressRing IsActive="{x:Bind ViewModel.IsLoadingProcesses, Mode=OneWay}"
+                                      Width="20" Height="20" HorizontalAlignment="Right" />
+                    </Grid>
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}"
+                               Text="Программы, занимающие больше 150 МБ памяти. Системные процессы, драйверы, лаунчеры и Discord здесь не показываются." />
+
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.Processes}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ProcessItem">
+                                <CheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}">
+                                    <StackPanel>
+                                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{x:Bind Details}" Style="{StaticResource TileCaptionStyle}" />
+                                    </StackPanel>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Закрыть выбранные" Style="{StaticResource AccentButtonStyle}"
+                                Command="{x:Bind ViewModel.CloseSelectedCommand}" />
+                        <Button Content="Обновить список" Command="{x:Bind ViewModel.RefreshProcessesCommand}" />
+                    </StackPanel>
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}"
+                               Text="Совет: программы, которые всегда мешают играть, добавь в «Настройки → Закрывать при запуске игры»." />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

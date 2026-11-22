@@ -1,0 +1,19 @@
+<Project>
+  <!-- Shared settings for every project in the solution. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>1.0.0</Version>
+    <Authors>Daniil Khlyshchankou</Authors>
+    <Product>GameTuner</Product>
+    <Copyright>Copyright (c) 2026 Daniil Khlyshchankou</Copyright>
+    <!-- CA1416: everything here is Windows-only by design. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WPF/WinUI templates sometimes drop System.IO from implicit usings. -->
+    <Using Include="System.IO" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="GameTuner.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer>
+        <StackPanel Padding="32,24,32,32" Spacing="16" MaxWidth="1200">
+
+            <TextBlock Text="Настройки" Style="{StaticResource PageTitleStyle}" />
+
+            <!-- Auto mode -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Авто-режим" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" Margin="0,0,0,8"
+                               Text="Когда запускается известная игра, GameTuner сам включает игровой режим, а после выхода из игры всё возвращает и сохраняет статистику сессии." />
+                    <ToggleSwitch Header="Включить авто-режим" IsOn="{x:Bind ViewModel.AutoModeEnabled, Mode=TwoWay}" />
+                    <CheckBox Content="Максимальная производительность питания во время игры"
+                              IsChecked="{x:Bind ViewModel.BoostPowerOnGameStart, Mode=TwoWay}"
+                              IsEnabled="{x:Bind ViewModel.AutoModeEnabled, Mode=OneWay}" />
+                    <CheckBox Content="Высокий приоритет процессу игры"
+                              IsChecked="{x:Bind ViewModel.RaiseGamePriority, Mode=TwoWay}"
+                              IsEnabled="{x:Bind ViewModel.AutoModeEnabled, Mode=OneWay}" />
+                    <CheckBox Content="Записывать FPS (нужны PresentMon и права администратора)"
+                              IsChecked="{x:Bind ViewModel.CaptureFps, Mode=TwoWay}"
+                              IsEnabled="{x:Bind ViewModel.AutoModeEnabled, Mode=OneWay}" />
+                    <CheckBox Content="Закрывать программы при запуске игры"
+                              IsChecked="{x:Bind ViewModel.CloseAppsOnGameStart, Mode=TwoWay}"
+                              IsEnabled="{x:Bind ViewModel.AutoModeEnabled, Mode=OneWay}" />
+                    <TextBox Header="Какие программы закрывать (через запятую, имя процесса)"
+                             PlaceholderText="например: chrome, OneDrive, Teams"
+                             Text="{x:Bind ViewModel.AppsToCloseText, Mode=TwoWay}"
+                             IsEnabled="{x:Bind ViewModel.CloseAppsOnGameStart, Mode=OneWay}"
+                             Margin="0,4,0,8" />
+                    <TextBox Header="Другие игры (имя .exe через запятую)"
+                             PlaceholderText="например: eldenring, RocketLeague, valorant"
+                             Text="{x:Bind ViewModel.ExtraGamesText, Mode=TwoWay}" />
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" Margin="0,4,0,0"
+                               Text="CS2, Minecraft и GTA V распознаются автоматически. Имя процесса можно посмотреть в Диспетчере задач → Подробности." />
+                </StackPanel>
+            </Border>
+
+            <!-- Monitoring -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Мониторинг и FPS" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.ElevationText}" TextWrapping="Wrap" />
+                    <Button Content="Перезапустить от администратора"
+                            Visibility="{x:Bind ViewModel.IsNotElevated}"
+                            Command="{x:Bind ViewModel.RestartAsAdminCommand}" />
+                    <TextBlock Text="{x:Bind ViewModel.PresentMonStatus, Mode=OneWay}" TextWrapping="Wrap"
+                               Style="{StaticResource TileCaptionStyle}" Margin="0,8,0,0" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Content="Скачать PresentMon" Style="{StaticResource AccentButtonStyle}"
+                                Visibility="{x:Bind ViewModel.CanInstallPresentMon, Mode=OneWay}"
+                                Command="{x:Bind ViewModel.InstallPresentMonCommand}" />
+                        <ProgressRing IsActive="{x:Bind ViewModel.IsInstalling, Mode=OneWay}" Width="20" Height="20" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- App -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Приложение" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <ToggleSwitch Header="Запускать вместе с Windows (свёрнутым в трей)"
+                                  IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}" />
+                    <ToggleSwitch Header="Крестик сворачивает в трей (выход — через меню значка в трее)"
+                                  IsOn="{x:Bind ViewModel.MinimizeToTray, Mode=TwoWay}" />
+                    <ToggleSwitch Header="Уведомления авто-режима"
+                                  IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}" />
+                </StackPanel>
+            </Border>
+
+            <!-- About -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{x:Bind ViewModel.Version}" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}">
+                        <Run Text="Данные, бэкапы и логи: " />
+                        <Run Text="{x:Bind ViewModel.DataFolder}" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Открыть папку данных" Command="{x:Bind ViewModel.OpenDataFolderCommand}" />
+                        <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/Dan88703/GameTuner" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

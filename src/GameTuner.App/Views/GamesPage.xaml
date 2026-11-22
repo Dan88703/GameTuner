@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="GameTuner.App.Views.GamesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:GameTuner.App.ViewModels">
+
+    <ScrollViewer>
+        <StackPanel Padding="32,24,32,32" Spacing="16" MaxWidth="1200">
+
+            <TextBlock Text="Игры" Style="{StaticResource PageTitleStyle}" />
+
+            <Border Style="{StaticResource CardStyle}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Header="Пресет графики" Width="280"
+                              ItemsSource="{x:Bind ViewModel.TierOptions}"
+                              SelectedIndex="{x:Bind ViewModel.SelectedTierIndex, Mode=TwoWay}" />
+                    <TextBlock Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,6" TextWrapping="Wrap"
+                               Style="{StaticResource TileCaptionStyle}"
+                               Text="«Авто» — по результатам анализа ноутбука. Если в игре всё равно лагает — выбери уровень ниже вручную." />
+                </Grid>
+            </Border>
+
+            <!-- Universal advice -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Любая игра — общие рекомендации" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.Advice}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Grid ColumnSpacing="8" Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon Glyph="&#xE73E;" FontSize="12" VerticalAlignment="Top" Margin="0,4,0,0"
+                                              Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                                    <TextBlock Grid.Column="1" Text="{x:Bind}" TextWrapping="Wrap" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- One card per supported game -->
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Games}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:GameItemViewModel">
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="{x:Bind Name}" Style="{StaticResource SubtitleTextBlockStyle}" />
+                                <TextBlock Text="{x:Bind Status, Mode=OneWay}" Style="{StaticResource TileCaptionStyle}" TextWrapping="Wrap" />
+
+                                <Expander Header="{x:Bind SettingsHeader, Mode=OneWay}" HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Stretch">
+                                    <ItemsControl ItemsSource="{x:Bind Settings}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:SettingRow">
+                                                <Grid Margin="0,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{x:Bind Label}" Style="{StaticResource TileCaptionStyle}" />
+                                                    <TextBlock Grid.Column="1" Text="{x:Bind Value}" FontFamily="Consolas" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+
+                                <TextBlock Text="{x:Bind Tips, Mode=OneWay}" TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Content="Применить" Style="{StaticResource AccentButtonStyle}"
+                                            Command="{x:Bind ApplyCommand}" />
+                                    <Button Content="Откатить"
+                                            Command="{x:Bind RestoreCommand}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

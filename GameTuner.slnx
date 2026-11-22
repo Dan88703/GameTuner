@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GameTuner.Core/GameTuner.Core.csproj" />
+    <Project Path="src/GameTuner.App/GameTuner.App.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GameTuner.Core.Tests/GameTuner.Core.Tests.csproj" />
+  </Folder>
+</Solution>
