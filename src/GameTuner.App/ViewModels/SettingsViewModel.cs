@@ -39,6 +39,8 @@ public partial class SettingsViewModel : ObservableObject
         MinimizeToTray = s.MinimizeToTray;
         ShowNotifications = s.ShowNotifications;
         HasDesktopShortcut = DesktopShortcut.Exists;
+        QuietModeIndex = (int)s.QuietMode;
+        FullPowerAppsText = string.Join(", ", s.FullPowerApps);
 
         // Settings can also change from the tray menu (auto mode on/off).
         settings.Changed += (_, _) =>
@@ -65,6 +67,11 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _minimizeToTray;
     [ObservableProperty] private bool _showNotifications;
     [ObservableProperty] private bool _hasDesktopShortcut;
+
+    // ---------- Quiet mode ----------
+    /// <summary>0 = off, 1 = on battery, 2 = always (same order as QuietModePolicy).</summary>
+    [ObservableProperty] private int _quietModeIndex;
+    [ObservableProperty] private string _fullPowerAppsText = "";
 
     /// <summary>Warn when shortcut/autostart would point into bin\Debug (see DesktopShortcut).</summary>
     public bool IsRunningFromBuildFolder { get; } = DesktopShortcut.IsRunningFromBuildFolder;
@@ -96,6 +103,11 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnStartWithWindowsChanged(bool value) => Save(s => s.StartWithWindows = value);
     partial void OnMinimizeToTrayChanged(bool value) => Save(s => s.MinimizeToTray = value);
     partial void OnShowNotificationsChanged(bool value) => Save(s => s.ShowNotifications = value);
+    partial void OnQuietModeIndexChanged(int value)
+    {
+        if (value >= 0) Save(s => s.QuietMode = (QuietModePolicy)value);
+    }
+    partial void OnFullPowerAppsTextChanged(string value) => Save(s => s.FullPowerApps = SplitList(value));
 
     /// <summary>The shortcut is a file on the desktop, not a setting: create or delete it directly.</summary>
     partial void OnHasDesktopShortcutChanged(bool value)

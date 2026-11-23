@@ -3,6 +3,18 @@
 All notable changes to GameTuner are listed here.
 The project follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
 
+## [1.2.0] — 2026-11-23
+
+### Added
+- **Quiet mode outside games** — when no game is running, CPU turbo boost is turned off
+  (and, in "Always" mode, Windows power mode is set to *Best power efficiency*):
+  the laptop runs cooler, quieter and lasts longer on battery.
+  - Modes: *Off*, *Only on battery*, *Always when no game is running*.
+  - Switches off automatically while a game runs, while an app from the
+    *needs full power* list runs, or with the **Full power for now** button.
+  - Original power settings are saved before any change and restored on game start,
+    on exit, and even after a crash (on the next start).
+
 ## [1.1.0] — 2026-11-23
 
 ### Added

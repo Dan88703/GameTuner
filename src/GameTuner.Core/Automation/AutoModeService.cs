@@ -41,6 +41,7 @@ public sealed class AutoModeService : IAutoModeService
     private readonly IFpsMonitor _fps;
     private readonly ISensorService _sensors;
     private readonly ISessionStore _sessions;
+    private readonly IQuietModeController _quiet;
     private readonly ILogger<AutoModeService> _log;
 
     private readonly object _lock = new();
@@ -49,8 +50,10 @@ public sealed class AutoModeService : IAutoModeService
 
     public AutoModeService(IGameWatcher watcher, ISettingsService settings, IPowerManager power,
         IWindowsGameSettings windows, IProcessManager processes, IFpsMonitor fps,
-        ISensorService sensors, ISessionStore sessions, ILogger<AutoModeService>? log = null)
+        ISensorService sensors, ISessionStore sessions, IQuietModeController quiet,
+        ILogger<AutoModeService>? log = null)
     {
+        _quiet = quiet;
         _watcher = watcher;
         _settings = settings;
         _power = power;
@@ -76,6 +79,10 @@ public sealed class AutoModeService : IAutoModeService
 
     private void OnGameStarted(object? sender, DetectedGame game)
     {
+        // Quiet mode must be switched off FIRST, so the power boost below
+        // saves the user's real settings, not the quiet-mode ones.
+        Step("quiet mode off", _quiet.Reevaluate);
+
         var s = _settings.Current;
         lock (_lock) _session = new SessionAccumulator(game.DisplayName);
 
@@ -142,6 +149,9 @@ public sealed class AutoModeService : IAutoModeService
             Step("power restore", () => _power.Restore());
             _weBoostedPower = false;
         }
+
+        // Back to quiet mode only after the original power plan is restored.
+        Step("quiet mode on", _quiet.Reevaluate);
 
         SessionAccumulator? session;
         lock (_lock)

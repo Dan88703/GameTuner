@@ -31,15 +31,22 @@ public partial class OptimizationViewModel : ObservableObject
     private readonly IWindowsGameSettings _windows;
     private readonly IProcessManager _processes;
     private readonly IDialogService _dialogs;
+    private readonly IQuietModeController _quiet;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcher;
     private bool _loading;
 
     public OptimizationViewModel(IPowerManager power, IWindowsGameSettings windows,
-                                 IProcessManager processes, IDialogService dialogs)
+                                 IProcessManager processes, IDialogService dialogs, IQuietModeController quiet)
     {
         _power = power;
         _windows = windows;
         _processes = processes;
         _dialogs = dialogs;
+        _quiet = quiet;
+        _dispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        // StateChanged comes from a background thread: update bindings on the UI thread.
+        _quiet.StateChanged += (_, _) => _dispatcher.TryEnqueue(RefreshQuiet);
+        RefreshQuiet();
         RefreshSystem();
         _ = RefreshProcessesAsync();
     }
@@ -52,9 +59,33 @@ public partial class OptimizationViewModel : ObservableObject
     [ObservableProperty] private bool _isLoadingProcesses;
     public ObservableCollection<ProcessItem> Processes { get; } = new();
 
+    // ---------- Quiet mode ----------
+    [ObservableProperty] private string _quietStatus = "";
+    [ObservableProperty] private bool _isQuietActive;
+    [ObservableProperty] private string _fullPowerButtonText = "Полная мощность на время";
+
+    [RelayCommand]
+    private async Task ToggleFullPowerAsync()
+    {
+        // powercfg takes a moment: keep the UI responsive.
+        if (_quiet.IsPaused) await Task.Run(_quiet.Resume);
+        else await Task.Run(_quiet.Pause);
+        RefreshQuiet();
+        RefreshSystem();
+    }
+
+    private void RefreshQuiet()
+    {
+        QuietStatus = _quiet.Status;
+        IsQuietActive = _quiet.IsActive;
+        FullPowerButtonText = _quiet.IsPaused ? "Вернуть тихий режим" : "Полная мощность на время";
+    }
+
     [RelayCommand]
     private void Boost()
     {
+        // Leave quiet mode first, so the boost saves the user's real power settings.
+        _quiet.Pause();
         LastAction = _power.EnableMaxPerformance();
         _windows.SetGameMode(true);
         RefreshSystem();
@@ -64,6 +95,7 @@ public partial class OptimizationViewModel : ObservableObject
     private void RestorePower()
     {
         LastAction = _power.Restore();
+        _quiet.Resume();
         RefreshSystem();
     }
 

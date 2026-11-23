@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using GameTuner.Core.Performance;
+using GameTuner.Core.Tuning;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Win32;
@@ -20,6 +21,12 @@ public sealed class AppSettings
 
     /// <summary>Extra executables (without .exe) treated as games, e.g. "eldenring".</summary>
     public List<string> ExtraGameExecutables { get; set; } = new();
+
+    // --- Quiet mode (outside games) ---
+    public QuietModePolicy QuietMode { get; set; } = QuietModePolicy.Always;
+
+    /// <summary>Apps that need full CPU power (e.g. "devenv", "blender"): quiet mode pauses while they run.</summary>
+    public List<string> FullPowerApps { get; set; } = new();
 
     // --- App behaviour ---
     public bool StartWithWindows { get; set; }

@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPowerManager, PowerManager>();
         services.AddSingleton<IWindowsGameSettings, WindowsGameSettings>();
         services.AddSingleton<IProcessManager, ProcessManager>();
+        services.AddSingleton<IQuietModeController, QuietModeController>();
 
         services.AddSingleton<ISensorService, SensorService>();
         services.AddSingleton<IFpsMonitor, PresentMonService>();

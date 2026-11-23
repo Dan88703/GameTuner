@@ -29,6 +29,23 @@
                 </StackPanel>
             </Border>
 
+            <!-- Quiet mode -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="10">
+                    <Grid>
+                        <TextBlock Text="Тихий режим" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <FontIcon Glyph="&#xEC0A;" HorizontalAlignment="Right"
+                                  Visibility="{x:Bind ViewModel.IsQuietActive, Mode=OneWay}"
+                                  Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+                    </Grid>
+                    <TextBlock Text="{x:Bind ViewModel.QuietStatus, Mode=OneWay}" TextWrapping="Wrap" />
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}"
+                               Text="Режим (выкл / от батареи / всегда) и программы-исключения — в Настройках." />
+                    <Button Content="{x:Bind ViewModel.FullPowerButtonText, Mode=OneWay}"
+                            Command="{x:Bind ViewModel.ToggleFullPowerCommand}" />
+                </StackPanel>
+            </Border>
+
             <!-- Windows switches -->
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="10">

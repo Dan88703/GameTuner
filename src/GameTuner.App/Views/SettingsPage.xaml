@@ -41,6 +41,26 @@
                 </StackPanel>
             </Border>
 
+            <!-- Quiet mode -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Тихий режим вне игр" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" Margin="0,0,0,8"
+                               Text="Когда игра не запущена, процессор работает без турбо-буста: ноутбук холоднее, тише и дольше живёт от батареи. Это безопасно — тяжёлые задачи просто выполняются чуть дольше. Во время игр и при выходе из GameTuner всё возвращается как было." />
+                    <RadioButtons SelectedIndex="{x:Bind ViewModel.QuietModeIndex, Mode=TwoWay}">
+                        <x:String>Выключен</x:String>
+                        <x:String>Только когда ноутбук работает от батареи</x:String>
+                        <x:String>Всегда, когда не запущена игра</x:String>
+                    </RadioButtons>
+                    <TextBox Header="Программам нужна полная мощность (имя процесса через запятую)"
+                             PlaceholderText="например: devenv, blender, Premiere Pro"
+                             Text="{x:Bind ViewModel.FullPowerAppsText, Mode=TwoWay}"
+                             Margin="0,8,0,0" />
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" Margin="0,4,0,0"
+                               Text="Пока такая программа запущена, тихий режим ставится на паузу. Например, для сборки больших проектов или рендера видео." />
+                </StackPanel>
+            </Border>
+
             <!-- Monitoring -->
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="10">

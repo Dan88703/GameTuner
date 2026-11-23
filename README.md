@@ -57,6 +57,12 @@ When the game exits, the power plan is restored and a **session summary** is sav
 
 Any game can be added by its process name — for example Fortnite or Genshin Impact (see [How to use](#how-to-use)).
 
+### Quiet mode (outside games)
+- When no game is running, CPU **turbo boost is turned off** — cooler, quieter, longer battery life.
+  The CPU still runs at its full base clock, so normal work stays smooth; heavy tasks just take a little longer.
+- Modes: off / only on battery / always. Apps that need full power (e.g. a compiler or video editor) can be listed as exceptions.
+- Fully reversible: original power settings are saved first and restored when a game starts, when GameTuner exits, or after a crash.
+
 ### Live monitoring
 - CPU and GPU load, RAM usage, battery and charger state — **no admin rights needed**.
 - CPU / GPU temperatures and clocks — in admin mode, via LibreHardwareMonitor.
@@ -220,6 +226,8 @@ Key design decisions:
 - **One sensor loop** owns all hardware access (LibreHardwareMonitor is not thread-safe); UI and auto mode only read the latest snapshot.
 - **Polling instead of WMI process events** for game detection — WMI events would require admin rights.
 - **Own tray icon on the Win32 API** instead of a third-party package — WinUI 3 has no tray control.
+- **Quiet mode changes only the turbo-boost setting** (`PERFBOOSTMODE`) of the active power plan and the power-mode slider —
+  no undervolting or clock caps that could make the system unstable.
 - **Own lightweight line chart** (shapes on a Canvas) instead of a chart library — no heavy or preview dependency.
 - **Adaptive session timelines** — long sessions are averaged into bigger buckets, so a session never stores more than 720 points.
 
@@ -255,6 +263,7 @@ All data is per user in `%LOCALAPPDATA%\GameTuner\`:
 - [ ] Game profiles as JSON files (add games without recompiling)
 - [ ] Automatic detection of installed games (Steam, Epic, EA, Xbox)
 - [x] Performance and temperature charts (1.1.0)
+- [x] Quiet mode outside games (1.2.0)
 - [ ] In-game FPS overlay
 - [ ] English / Polish / Russian UI localization
 

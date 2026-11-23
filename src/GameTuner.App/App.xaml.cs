@@ -4,6 +4,7 @@ using GameTuner.Core;
 using GameTuner.Core.Automation;
 using GameTuner.Core.Monitoring;
 using GameTuner.Core.Settings;
+using GameTuner.Core.Tuning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
@@ -69,6 +70,7 @@ public partial class App : Application
         Services.GetRequiredService<IMetricsHistory>().Start();   // chart data, from app start
         var autoMode = Services.GetRequiredService<IAutoModeService>();
         autoMode.Start();
+        Services.GetRequiredService<IQuietModeController>().Start();
 
         MainWindow = new MainWindow();
 
@@ -104,6 +106,7 @@ public partial class App : Application
 
         // Dispose order matters: auto mode restores the power plan, then sensors stop.
         Services.GetRequiredService<IAutoModeService>().Dispose();
+        Services.GetRequiredService<IQuietModeController>().Dispose();   // turbo boost back to normal
         Services.GetRequiredService<IFpsMonitor>().Dispose();
         Services.GetRequiredService<ISensorService>().Dispose();
         Services.GetRequiredService<IGameWatcher>().Dispose();
