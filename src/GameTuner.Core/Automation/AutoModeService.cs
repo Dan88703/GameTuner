@@ -165,7 +165,9 @@ public sealed class AutoModeService : IAutoModeService
 
     private void OnSensorsUpdated(object? sender, SensorSnapshot snapshot)
     {
-        lock (_lock) _session?.Add(snapshot);
+        // Read FPS outside the lock: it takes PresentMon's own lock.
+        double? fps = _fps.Live?.AverageFps;
+        lock (_lock) _session?.Add(snapshot, fps);
     }
 
     private void Step(string name, Action action)
@@ -198,13 +200,15 @@ public sealed class AutoModeService : IAutoModeService
         private double? _maxCpuTemp, _maxGpuTemp;
         private double _cpuLoadSum, _gpuLoadSum;
         private int _samples, _gpuSamples;
+        private readonly TimelineBuilder _timeline = new();
 
         public SessionAccumulator(string game) => _game = game;
 
         public TimeSpan Elapsed => DateTime.Now - _start;
 
-        public void Add(SensorSnapshot s)
+        public void Add(SensorSnapshot s, double? fps = null)
         {
+            _timeline.Add(MetricPoint.From(s, fps));
             _samples++;
             _cpuLoadSum += s.CpuLoad;
             if (s.GpuLoad is double g) { _gpuLoadSum += g; _gpuSamples++; }
@@ -222,7 +226,8 @@ public sealed class AutoModeService : IAutoModeService
             MaxCpuTempC = _maxCpuTemp,
             MaxGpuTempC = _maxGpuTemp,
             AverageCpuLoad = _samples > 0 ? Math.Round(_cpuLoadSum / _samples, 1) : 0,
-            AverageGpuLoad = _gpuSamples > 0 ? Math.Round(_gpuLoadSum / _gpuSamples, 1) : null
+            AverageGpuLoad = _gpuSamples > 0 ? Math.Round(_gpuLoadSum / _gpuSamples, 1) : null,
+            Timeline = _timeline.Build()
         };
     }
 }

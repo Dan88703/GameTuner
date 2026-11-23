@@ -38,6 +38,7 @@ public partial class SettingsViewModel : ObservableObject
         StartWithWindows = s.StartWithWindows;
         MinimizeToTray = s.MinimizeToTray;
         ShowNotifications = s.ShowNotifications;
+        HasDesktopShortcut = DesktopShortcut.Exists;
 
         // Settings can also change from the tray menu (auto mode on/off).
         settings.Changed += (_, _) =>
@@ -63,6 +64,10 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _minimizeToTray;
     [ObservableProperty] private bool _showNotifications;
+    [ObservableProperty] private bool _hasDesktopShortcut;
+
+    /// <summary>Warn when shortcut/autostart would point into bin\Debug (see DesktopShortcut).</summary>
+    public bool IsRunningFromBuildFolder { get; } = DesktopShortcut.IsRunningFromBuildFolder;
 
     // ---------- Admin & PresentMon ----------
     public bool IsElevated { get; } = Elevation.IsElevated;
@@ -91,6 +96,21 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnStartWithWindowsChanged(bool value) => Save(s => s.StartWithWindows = value);
     partial void OnMinimizeToTrayChanged(bool value) => Save(s => s.MinimizeToTray = value);
     partial void OnShowNotificationsChanged(bool value) => Save(s => s.ShowNotifications = value);
+
+    /// <summary>The shortcut is a file on the desktop, not a setting: create or delete it directly.</summary>
+    partial void OnHasDesktopShortcutChanged(bool value)
+    {
+        if (!_ready) return;
+        try
+        {
+            if (value) DesktopShortcut.Create();
+            else DesktopShortcut.Remove();
+        }
+        catch (Exception ex)
+        {
+            _ = _dialogs.ShowAsync("Не удалось изменить ярлык", ex.Message);
+        }
+    }
 
     [RelayCommand]
     private void RestartAsAdmin()

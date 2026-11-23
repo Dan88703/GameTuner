@@ -47,6 +47,11 @@
                         <FontIcon Glyph="&#xE7FC;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Графики" Tag="charts">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D2;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Оптимизация" Tag="optimization">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE945;" />

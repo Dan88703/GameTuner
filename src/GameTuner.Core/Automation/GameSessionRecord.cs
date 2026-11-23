@@ -1,4 +1,5 @@
 using System.Text.Json;
+using GameTuner.Core.Monitoring;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -18,6 +19,9 @@ public sealed record GameSessionRecord
     public double? MaxGpuTempC { get; init; }
     public double AverageCpuLoad { get; init; }
     public double? AverageGpuLoad { get; init; }
+
+    /// <summary>Load / temperature / FPS over the session, for the charts (max 720 points).</summary>
+    public List<MetricPoint> Timeline { get; init; } = new();
 }
 
 public interface ISessionStore

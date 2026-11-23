@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<ISensorService, SensorService>();
         services.AddSingleton<IFpsMonitor, PresentMonService>();
+        services.AddSingleton<IMetricsHistory, MetricsHistory>();
 
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<ISessionStore, SessionStore>();

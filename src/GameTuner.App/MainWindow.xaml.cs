@@ -87,6 +87,7 @@ public sealed partial class MainWindow : Window
             : (args.SelectedItemContainer?.Tag as string) switch
             {
                 "games" => typeof(GamesPage),
+                "charts" => typeof(ChartsPage),
                 "optimization" => typeof(OptimizationPage),
                 _ => typeof(DashboardPage)
             };

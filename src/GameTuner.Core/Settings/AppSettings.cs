@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using GameTuner.Core.Performance;
 using Microsoft.Extensions.Logging;
@@ -103,5 +104,75 @@ public static class AutoStart
             key.SetValue(ValueName, $"\"{exe}\" {MinimizedArg}");
         else
             key.DeleteValue(ValueName, throwOnMissingValue: false);
+    }
+}
+
+/// <summary>
+/// Desktop shortcut (GameTuner.lnk) pointing to the running exe.
+///
+/// How: .lnk files are a binary format, so instead of writing one by hand we
+/// ask Windows to do it through the "WScript.Shell" COM object (the same one
+/// installers and scripts use). <c>dynamic</c> lets us call its methods
+/// without generating COM interop classes.
+/// </summary>
+public static class DesktopShortcut
+{
+    public static string ShortcutPath => Path.Combine(
+        // DesktopDirectory follows OneDrive "Desktop" redirection.
+        Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "GameTuner.lnk");
+
+    public static bool Exists => File.Exists(ShortcutPath);
+
+    /// <summary>
+    /// True when the app runs straight from the build output (bin\Debug or
+    /// bin\Release, e.g. via "dotnet run"). A shortcut or autostart entry made
+    /// from there breaks as soon as the project is cleaned or rebuilt elsewhere.
+    /// </summary>
+    public static bool IsRunningFromBuildFolder
+    {
+        get
+        {
+            string exe = Environment.ProcessPath ?? "";
+            return exe.Contains(@"\bin\Debug\", StringComparison.OrdinalIgnoreCase)
+                || exe.Contains(@"\bin\x64\Debug\", StringComparison.OrdinalIgnoreCase)
+                || exe.Contains(@"\bin\Release\", StringComparison.OrdinalIgnoreCase)
+                || exe.Contains(@"\bin\x64\Release\", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    public static void Create()
+    {
+        string exe = Environment.ProcessPath
+                     ?? throw new InvalidOperationException("Cannot determine the path of GameTuner.exe");
+        Type shellType = Type.GetTypeFromProgID("WScript.Shell")
+                         ?? throw new PlatformNotSupportedException("WScript.Shell is not available");
+
+        dynamic shell = Activator.CreateInstance(shellType)!;
+        try
+        {
+            dynamic link = shell.CreateShortcut(ShortcutPath);
+            try
+            {
+                link.TargetPath = exe;
+                link.WorkingDirectory = Path.GetDirectoryName(exe);
+                link.IconLocation = exe + ",0";   // icon #0 embedded in the exe (ApplicationIcon)
+                link.Description = "GameTuner — game optimizer";
+                link.Save();
+            }
+            finally
+            {
+                Marshal.FinalReleaseComObject(link);
+            }
+        }
+        finally
+        {
+            // COM objects are not garbage-collected promptly: release them explicitly.
+            Marshal.FinalReleaseComObject(shell);
+        }
+    }
+
+    public static void Remove()
+    {
+        if (File.Exists(ShortcutPath)) File.Delete(ShortcutPath);
     }
 }

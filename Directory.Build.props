@@ -4,7 +4,8 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>1.0.0</Version>
+    <!-- Semantic versioning: MAJOR.MINOR.PATCH. New features = MINOR, bug fixes only = PATCH. -->
+    <Version>1.1.0</Version>
     <Authors>Daniil Khlyshchankou</Authors>
     <Product>GameTuner</Product>
     <Copyright>Copyright (c) 2026 Daniil Khlyshchankou</Copyright>

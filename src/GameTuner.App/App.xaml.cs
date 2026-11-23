@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+// Serilog's sink methods (WriteTo.File) are extension methods: they are only
+// visible with the namespace imported, a fully qualified type name is not enough.
 using Serilog;
 
 namespace GameTuner.App;
@@ -58,7 +60,13 @@ public partial class App : Application
             return;
         }
 
+        // If the exe moved (reinstall, new build folder), point the autostart
+        // entry at the current exe again so it doesn't launch a stale path.
+        if (Services.GetRequiredService<ISettingsService>().Current.StartWithWindows)
+            AutoStart.Apply(true);
+
         Services.GetRequiredService<ISensorService>().Start();
+        Services.GetRequiredService<IMetricsHistory>().Start();   // chart data, from app start
         var autoMode = Services.GetRequiredService<IAutoModeService>();
         autoMode.Start();
 
@@ -174,6 +182,7 @@ public partial class App : Application
         services.AddSingleton<GamesViewModel>();
         services.AddSingleton<OptimizationViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<ChartsViewModel>();
 
         return services.BuildServiceProvider();
     }

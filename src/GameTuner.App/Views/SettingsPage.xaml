@@ -64,6 +64,12 @@
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="4">
                     <TextBlock Text="Приложение" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <InfoBar IsOpen="{x:Bind ViewModel.IsRunningFromBuildFolder}" IsClosable="False" Severity="Warning"
+                             Title="Запущено из папки сборки"
+                             Message="Ярлык и автозапуск будут указывать на bin\Debug и сломаются после очистки проекта. Установи GameTuner скриптом install-local.ps1 и включи их уже в установленной версии."
+                             Margin="0,0,0,8" />
+                    <ToggleSwitch Header="Ярлык на рабочем столе"
+                                  IsOn="{x:Bind ViewModel.HasDesktopShortcut, Mode=TwoWay}" />
                     <ToggleSwitch Header="Запускать вместе с Windows (свёрнутым в трей)"
                                   IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}" />
                     <ToggleSwitch Header="Крестик сворачивает в трей (выход — через меню значка в трее)"

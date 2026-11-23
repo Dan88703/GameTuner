@@ -62,8 +62,13 @@ Any game can be added by its process name — for example Fortnite or Genshin Im
 - CPU / GPU temperatures and clocks — in admin mode, via LibreHardwareMonitor.
 - **FPS and 1% lows** via Intel PresentMon (works on any GPU vendor).
 
+### Charts
+- Live charts for the last 1, 5 or 10 minutes: **CPU / GPU / RAM load**, **CPU / GPU temperature** and **FPS**.
+- Current, average and peak values, plus a warning when the laptop runs hot enough to throttle.
+
 ### Session history
-The last 50 play sessions: duration, average FPS, 1% low, peak temperatures, average CPU/GPU load.
+The last 50 play sessions: duration, average FPS, 1% low, peak temperatures, average CPU/GPU load —
+and a full load / temperature / FPS timeline of each session on the Charts page.
 
 ### Tray app
 Lives in the notification area, can start with Windows, and shows a notification when auto mode kicks in.
@@ -99,6 +104,15 @@ dotnet test tests/GameTuner.Core.Tests     # run unit tests
 dotnet run --project src/GameTuner.App      # build and start the app
 ```
 
+Install your own build like a normal app (to `%LOCALAPPDATA%\Programs\GameTuner`,
+with a desktop shortcut) — run it again after pulling new code to update:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install-local.ps1
+```
+
+Then enable *Start with Windows* in the app's settings.
+
 Release build (self-contained, nothing to install on the target PC):
 
 ```powershell
@@ -113,12 +127,13 @@ and publish a release (`.github/workflows/release.yml`).
 ## How to use
 
 > **Note:** the interface is currently in Russian; English localization is on the [roadmap](#roadmap).
-> Names below are translated: *Overview* = «Обзор», *Games* = «Игры», *Optimization* = «Оптимизация», *Settings* = «Настройки».
+> Names below are translated: *Overview* = «Обзор», *Games* = «Игры», *Charts* = «Графики», *Optimization* = «Оптимизация», *Settings* = «Настройки».
 
 1. **Overview** — check the detected hardware and the recommended graphics tier.
 2. **Games** — pick a preset (or keep *Auto*), expand *What will be changed*, and click **Apply**. **Undo** restores the previous config.
-3. **Optimization** — boost power manually, toggle Game Mode, close heavy background apps.
-4. **Settings** — configure auto mode, autostart, tray behaviour and FPS capture.
+3. **Charts** — watch load, temperatures and FPS live, or open a past game session.
+4. **Optimization** — boost power manually, toggle Game Mode, close heavy background apps.
+5. **Settings** — configure auto mode, autostart, tray behaviour and FPS capture.
 
 ### Adding your own games to auto mode
 
@@ -205,6 +220,8 @@ Key design decisions:
 - **One sensor loop** owns all hardware access (LibreHardwareMonitor is not thread-safe); UI and auto mode only read the latest snapshot.
 - **Polling instead of WMI process events** for game detection — WMI events would require admin rights.
 - **Own tray icon on the Win32 API** instead of a third-party package — WinUI 3 has no tray control.
+- **Own lightweight line chart** (shapes on a Canvas) instead of a chart library — no heavy or preview dependency.
+- **Adaptive session timelines** — long sessions are averaged into bigger buckets, so a session never stores more than 720 points.
 
 ### Data locations
 
@@ -237,8 +254,15 @@ All data is per user in `%LOCALAPPDATA%\GameTuner\`:
 - [ ] Built-in profiles for Fortnite, Genshin Impact, Valorant, Apex Legends
 - [ ] Game profiles as JSON files (add games without recompiling)
 - [ ] Automatic detection of installed games (Steam, Epic, EA, Xbox)
+- [x] Performance and temperature charts (1.1.0)
 - [ ] In-game FPS overlay
 - [ ] English / Polish / Russian UI localization
+
+---
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
