@@ -3,6 +3,17 @@
 All notable changes to GameTuner are listed here.
 The project follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
 
+## [1.4.0] — 2026-11-24
+
+### Added
+- **Laptop / desktop detection** from the SMBIOS chassis type (with a battery fallback).
+  Shown on the Overview page; laptop-only hints (charger, "only on battery" quiet mode) adapt to desktops.
+  A UPS "battery" no longer makes a desktop look like a laptop.
+- **30 popular games detected out of the box** by auto mode — Fortnite, Valorant, Genshin Impact,
+  Dota 2, Apex Legends, League of Legends, Roblox, Rainbow Six Siege, PUBG, Rust and more —
+  so a fresh install on another PC needs no setup.
+- README: installing GameTuner on other computers.
+
 ## [1.3.0] — 2026-11-24
 
 ### Added

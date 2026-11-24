@@ -37,7 +37,7 @@
                              PlaceholderText="например: eldenring, RocketLeague, valorant"
                              Text="{x:Bind ViewModel.ExtraGamesText, Mode=TwoWay}" />
                     <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" Margin="0,4,0,0"
-                               Text="CS2, Minecraft и GTA V распознаются автоматически. Имя процесса можно посмотреть в Диспетчере задач → Подробности." />
+                               Text="CS2, Minecraft, GTA V, Fortnite, Valorant, Genshin, Dota 2, Apex, Roblox и ещё два десятка популярных игр распознаются автоматически. Сюда — только то, чего нет в списке. Имя процесса можно посмотреть в Диспетчере задач → Подробности." />
                 </StackPanel>
             </Border>
 
@@ -52,6 +52,8 @@
                         <x:String>Только когда ноутбук работает от батареи</x:String>
                         <x:String>Всегда, когда не запущена игра</x:String>
                     </RadioButtons>
+                    <InfoBar IsOpen="{x:Bind ViewModel.IsDesktop, Mode=OneWay}" IsClosable="False" Severity="Informational"
+                             Message="Это компьютер без батареи: вариант «Только от батареи» на нём ничего не меняет. Выбери «Всегда» или «Выключен»." />
                     <TextBox Header="Программам нужна полная мощность (имя процесса через запятую)"
                              PlaceholderText="например: devenv, blender, Premiere Pro"
                              Text="{x:Bind ViewModel.FullPowerAppsText, Mode=TwoWay}"

@@ -21,8 +21,9 @@ public partial class SettingsViewModel : ObservableObject
     private readonly IDialogService _dialogs;
     private readonly bool _ready;
 
-    public SettingsViewModel(ISettingsService settings, IFpsMonitor fps, IDialogService dialogs)
+    public SettingsViewModel(ISettingsService settings, IFpsMonitor fps, IDialogService dialogs, SystemProfileService profile)
     {
+        _ = LoadDeviceKindAsync(profile);
         _settings = settings;
         _fps = fps;
         _dialogs = dialogs;
@@ -67,6 +68,16 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _minimizeToTray;
     [ObservableProperty] private bool _showNotifications;
     [ObservableProperty] private bool _hasDesktopShortcut;
+
+    // ---------- Device ----------
+    /// <summary>Desktop PC: "only on battery" quiet mode does nothing there.</summary>
+    [ObservableProperty] private bool _isDesktop;
+
+    private async Task LoadDeviceKindAsync(SystemProfileService profile)
+    {
+        var (info, _) = await profile.GetAsync();
+        IsDesktop = info.DeviceKind == GameTuner.Core.Hardware.DeviceKind.Desktop;
+    }
 
     // ---------- Quiet mode ----------
     /// <summary>0 = off, 1 = on battery, 2 = always (same order as QuietModePolicy).</summary>

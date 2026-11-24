@@ -55,7 +55,8 @@ When a known game starts, GameTuner automatically:
 
 When the game exits, the power plan is restored and a **session summary** is saved.
 
-Any game can be added by its process name — for example Fortnite or Genshin Impact (see [How to use](#how-to-use)).
+About 30 popular games (Fortnite, Valorant, Genshin Impact, Dota 2, Apex Legends, League of Legends, Roblox, …)
+are detected out of the box; any other game can be added by its process name (see [How to use](#how-to-use)).
 
 ### Quiet mode (outside games)
 - When no game is running, CPU **turbo boost is turned off** — cooler, quieter, longer battery life.
@@ -100,11 +101,22 @@ Lives in the notification area, can start with Windows, and shows a notification
 
 ## Getting started
 
-### Install a release
+### Install a release (any laptop or PC)
 
-Download `GameTuner-x.y.z-setup.exe` or the portable zip from
-[Releases](https://github.com/Dan88703/GameTuner/releases).
-The installer is per-user and does not need admin rights.
+Download from [Releases](https://github.com/Dan88703/GameTuner/releases):
+
+| File | Use it when |
+|---|---|
+| `GameTuner-x.y.z-setup.exe` | Normal install: Start menu entry, optional desktop shortcut, uninstaller. No admin rights needed. |
+| `GameTuner-x.y.z-win-x64-portable.zip` | Run without installing: unzip anywhere (e.g. a USB stick) and start `GameTuner.exe`. |
+
+The build is **self-contained**: the target PC needs nothing else installed — no .NET, no Windows App SDK.
+It works on laptops and desktops; the device type is detected automatically.
+
+> **"Windows protected your PC" (SmartScreen):** the exe is not code-signed (certificates are paid),
+> so on first launch Windows may warn. Click **More info → Run anyway**.
+
+Each PC keeps its own settings and history in `%LOCALAPPDATA%\GameTuner`.
 
 ### Build from source
 
@@ -150,7 +162,7 @@ and publish a release (`.github/workflows/release.yml`).
 
 ### Adding your own games to auto mode
 
-CS2, Minecraft and GTA V are detected automatically. For any other game, add
+CS2, Minecraft, GTA V and ~30 popular games are detected automatically. For any other game, add
 its **process name** in *Settings → Other games* (comma-separated, `.exe` is optional):
 
 ```

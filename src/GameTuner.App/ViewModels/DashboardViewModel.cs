@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using GameTuner.App.Services;
 using GameTuner.Core.Automation;
 using GameTuner.Core.Games;
+using GameTuner.Core.Hardware;
 using GameTuner.Core.Monitoring;
 using GameTuner.Core.Tuning;
 using Microsoft.UI.Dispatching;
@@ -61,6 +62,7 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty] private string _diskText = "—";
     [ObservableProperty] private string _screenText = "—";
     [ObservableProperty] private string _scoresText = "";
+    [ObservableProperty] private string _deviceText = "—";
     public ObservableCollection<string> Notes { get; } = new();
 
     // ---------- Live tiles ----------
@@ -105,6 +107,12 @@ public partial class DashboardViewModel : ObservableObject
         GpuName = string.Join("\n", info.Gpus.Select(g =>
             $"{g.Name} · {(g.VramGb > 0 ? $"{g.VramGb} ГБ" : "? ГБ")} · {(g.IsIntegrated ? "встроенная" : "дискретная")}"));
         RamText = $"{info.RamGb} ГБ";
+        DeviceText = info.DeviceKind switch
+        {
+            DeviceKind.Laptop => "Ноутбук",
+            DeviceKind.Desktop => "Компьютер (ПК)",
+            _ => "Не определён"
+        };
         DiskText = info.SystemDriveIsSsd switch { true => "SSD", false => "HDD", null => "не определён" };
         ScreenText = info.ScreenWidth > 0
             ? $"{info.ScreenWidth}×{info.ScreenHeight}{(info.RefreshRateHz > 0 ? $" · {info.RefreshRateHz} Гц" : "")}"

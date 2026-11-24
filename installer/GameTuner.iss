@@ -3,7 +3,7 @@
 ;   ISCC.exe /DAppVersion=1.0.0 /DSourceDir=..\artifacts\publish /DOutputDir=..\artifacts GameTuner.iss
 
 #ifndef AppVersion
-  #define AppVersion "1.3.0"
+  #define AppVersion "1.4.0"
 #endif
 #ifndef SourceDir
   #define SourceDir "..\artifacts\publish"

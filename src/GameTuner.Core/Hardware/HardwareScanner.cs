@@ -36,9 +36,10 @@ public sealed class HardwareScanner : IHardwareScanner
         ReadRam(info);
         ReadSystemDrive(info);
         ReadBattery(info);
+        info.DeviceKind = DetectDeviceKind(ReadChassisTypes(), info.HasBattery);
 
-        _log.LogInformation("Hardware scan: CPU={Cpu}, GPUs={Gpus}, RAM={Ram} GB, SSD={Ssd}",
-            info.CpuName, string.Join(" | ", info.Gpus.Select(g => $"{g.Name} {g.VramGb} GB")),
+        _log.LogInformation("Hardware scan: {Kind}, CPU={Cpu}, GPUs={Gpus}, RAM={Ram} GB, SSD={Ssd}",
+            info.DeviceKind, info.CpuName, string.Join(" | ", info.Gpus.Select(g => $"{g.Name} {g.VramGb} GB")),
             info.RamGb, info.SystemDriveIsSsd);
         return info;
     }
@@ -151,6 +152,45 @@ public sealed class HardwareScanner : IHardwareScanner
             }
         }
         catch (Exception) { /* ignore, fallback to WMI value */ }
+        return result;
+    }
+
+    // SMBIOS chassis types (DMTF standard) that mean "portable device".
+    // 8 Portable, 9 Laptop, 10 Notebook, 11 Hand Held, 14 Sub Notebook,
+    // 30 Tablet, 31 Convertible, 32 Detachable.
+    private static readonly HashSet<int> PortableChassis = new() { 8, 9, 10, 11, 14, 30, 31, 32 };
+
+    // 3 Desktop, 4 Low Profile Desktop, 5 Pizza Box, 6 Mini Tower, 7 Tower,
+    // 13 All in One, 15 Space-saving, 16 Lunch Box, 35 Mini PC, 36 Stick PC.
+    private static readonly HashSet<int> DesktopChassis = new() { 3, 4, 5, 6, 7, 13, 15, 16, 35, 36 };
+
+    /// <summary>
+    /// Laptop or desktop? The firmware (SMBIOS) reports a "chassis type" for
+    /// the case of the computer. It's the most reliable source, but some cheap
+    /// boards report "Other" (1) or "Unknown" (2) — then a battery means laptop.
+    /// </summary>
+    public static DeviceKind DetectDeviceKind(IReadOnlyCollection<int> chassisTypes, bool hasBattery)
+    {
+        if (chassisTypes.Any(PortableChassis.Contains)) return DeviceKind.Laptop;
+        // A desktop can report a "battery" too — a UPS connected over USB — so
+        // a desktop chassis wins over the battery check.
+        if (chassisTypes.Any(DesktopChassis.Contains)) return DeviceKind.Desktop;
+        return hasBattery ? DeviceKind.Laptop : DeviceKind.Desktop;
+    }
+
+    private List<int> ReadChassisTypes()
+    {
+        var result = new List<int>();
+        try
+        {
+            using var searcher = new ManagementObjectSearcher("SELECT ChassisTypes FROM Win32_SystemEnclosure");
+            foreach (ManagementObject enclosure in searcher.Get())
+            {
+                if (enclosure["ChassisTypes"] is ushort[] types)
+                    result.AddRange(types.Select(t => (int)t));
+            }
+        }
+        catch (Exception ex) { _log.LogWarning(ex, "Chassis type query failed"); }
         return result;
     }
 

@@ -104,7 +104,10 @@ public sealed class GameWatcher : IGameWatcher
                 var profile = _library.Profiles.FirstOrDefault(g => g.MatchesProcess(name, Title));
                 if (profile != null) return new DetectedGame(p.Id, name, profile.Name, profile.Id);
 
-                if (extra.Contains(name)) return new DetectedGame(p.Id, name, name, null);
+                if (extra.Contains(name)) return new DetectedGame(p.Id, name, KnownGames.Find(name) ?? name, null);
+
+                // Built-in list of popular games: works on a fresh install with no setup.
+                if (KnownGames.Find(name) is string known) return new DetectedGame(p.Id, name, known, null);
             }
             return null;
         }

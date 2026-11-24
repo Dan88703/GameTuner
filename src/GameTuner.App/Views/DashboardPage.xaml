@@ -100,18 +100,20 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                            <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="Процессор" Style="{StaticResource TileCaptionStyle}" />
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind ViewModel.CpuName, Mode=OneWay}" TextWrapping="Wrap" />
-                        <TextBlock Grid.Row="1" Text="Видеокарта" Style="{StaticResource TileCaptionStyle}" />
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.GpuName, Mode=OneWay}" TextWrapping="Wrap" />
-                        <TextBlock Grid.Row="2" Text="Память" Style="{StaticResource TileCaptionStyle}" />
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.RamText, Mode=OneWay}" />
-                        <TextBlock Grid.Row="3" Text="Системный диск" Style="{StaticResource TileCaptionStyle}" />
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.DiskText, Mode=OneWay}" />
-                        <TextBlock Grid.Row="4" Text="Экран" Style="{StaticResource TileCaptionStyle}" />
-                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.ScreenText, Mode=OneWay}" />
+                        <TextBlock Grid.Row="0" Text="Устройство" Style="{StaticResource TileCaptionStyle}" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind ViewModel.DeviceText, Mode=OneWay}" />
+                        <TextBlock Grid.Row="1" Text="Процессор" Style="{StaticResource TileCaptionStyle}" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.CpuName, Mode=OneWay}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="2" Text="Видеокарта" Style="{StaticResource TileCaptionStyle}" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.GpuName, Mode=OneWay}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="3" Text="Память" Style="{StaticResource TileCaptionStyle}" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.RamText, Mode=OneWay}" />
+                        <TextBlock Grid.Row="4" Text="Системный диск" Style="{StaticResource TileCaptionStyle}" />
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.DiskText, Mode=OneWay}" />
+                        <TextBlock Grid.Row="5" Text="Экран" Style="{StaticResource TileCaptionStyle}" />
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.ScreenText, Mode=OneWay}" />
                     </Grid>
                     <TextBlock Text="{x:Bind ViewModel.ScoresText, Mode=OneWay}" Style="{StaticResource TileCaptionStyle}" />
                     <ItemsControl ItemsSource="{x:Bind ViewModel.Notes}">

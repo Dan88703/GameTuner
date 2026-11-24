@@ -65,9 +65,9 @@ public sealed class TierCalculator : ITierCalculator
             result.Notes.Add("Система стоит на HDD — возможны подгрузки и статтеры. SSD сильно поможет.");
 
         if (info.Gpus.Count > 1 && info.Gpus.Any(g => !g.IsIntegrated))
-            result.Notes.Add("В ноутбуке две видеокарты. Проверь в «Параметры → Дисплей → Графика», что игры запускаются на дискретной.");
+            result.Notes.Add("Две видеокарты (встроенная и дискретная). Проверь в «Параметры → Дисплей → Графика», что игры запускаются на дискретной.");
 
-        if (info.HasBattery)
+        if (info.IsLaptop)
             result.Notes.Add("Играй с подключённой зарядкой: от батареи ноутбук сильно режет частоты CPU/GPU.");
 
         return result;

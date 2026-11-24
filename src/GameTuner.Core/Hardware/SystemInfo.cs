@@ -17,6 +17,11 @@ public sealed class SystemInfo
 
     public bool HasBattery { get; set; }
 
+    /// <summary>Laptop or desktop PC — decides which hints and options make sense.</summary>
+    public DeviceKind DeviceKind { get; set; } = DeviceKind.Unknown;
+
+    public bool IsLaptop => DeviceKind == DeviceKind.Laptop;
+
     public int ScreenWidth { get; set; }
     public int ScreenHeight { get; set; }
     public int RefreshRateHz { get; set; }
@@ -26,6 +31,13 @@ public sealed class SystemInfo
     /// <summary>The GPU that games will most likely use (discrete if there is one).</summary>
     public GpuInfo? PrimaryGpu =>
         Gpus.FirstOrDefault(g => !g.IsIntegrated) ?? Gpus.FirstOrDefault();
+}
+
+public enum DeviceKind
+{
+    Unknown,
+    Laptop,
+    Desktop
 }
 
 public sealed class GpuInfo
