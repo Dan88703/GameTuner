@@ -186,6 +186,7 @@ public partial class App : Application
         services.AddSingleton<OptimizationViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<ChartsViewModel>();
+        services.AddSingleton<CleanupViewModel>();
 
         return services.BuildServiceProvider();
     }

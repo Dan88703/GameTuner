@@ -88,6 +88,7 @@ public sealed partial class MainWindow : Window
             {
                 "games" => typeof(GamesPage),
                 "charts" => typeof(ChartsPage),
+                "cleanup" => typeof(CleanupPage),
                 "optimization" => typeof(OptimizationPage),
                 _ => typeof(DashboardPage)
             };

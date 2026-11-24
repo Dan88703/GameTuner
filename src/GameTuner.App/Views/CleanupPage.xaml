@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="GameTuner.App.Views.CleanupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:GameTuner.App.ViewModels">
+
+    <ScrollViewer>
+        <StackPanel Padding="32,24,32,32" Spacing="16" MaxWidth="1200">
+
+            <TextBlock Text="Очистка диска" Style="{StaticResource PageTitleStyle}" />
+
+            <InfoBar IsOpen="{x:Bind ViewModel.ShowAdminHint}" IsClosable="True" Severity="Informational"
+                     Title="Часть пунктов недоступна"
+                     Message="Системные папки Windows (кэш обновлений, Windows\Temp, дампы) можно чистить только в режиме администратора — обычно там больше всего мусора.">
+                <InfoBar.ActionButton>
+                    <Button Content="Перезапустить от администратора" Command="{x:Bind ViewModel.RestartAsAdminCommand}" />
+                </InfoBar.ActionButton>
+            </InfoBar>
+
+            <!-- Drive and actions -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="{x:Bind ViewModel.DriveText, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <ProgressBar Value="{x:Bind ViewModel.DriveUsedPercent, Mode=OneWay}" Maximum="100" Height="8" />
+                    <TextBlock Text="{x:Bind ViewModel.TotalText, Mode=OneWay}" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Сканировать" Command="{x:Bind ViewModel.ScanCommand}" />
+                        <Button Content="Очистить выбранное" Style="{StaticResource AccentButtonStyle}"
+                                Command="{x:Bind ViewModel.CleanCommand}" />
+                        <Button Content="Стоп" Command="{x:Bind ViewModel.CancelCommand}"
+                                Visibility="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
+                        <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" Width="20" Height="20" />
+                        <TextBlock Text="{x:Bind ViewModel.Status, Mode=OneWay}" VerticalAlignment="Center"
+                                   Style="{StaticResource TileCaptionStyle}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Categories -->
+            <Border Style="{StaticResource CardStyle}">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CleanupItemViewModel">
+                            <Grid ColumnSpacing="16" Padding="0,10" BorderThickness="0,0,0,1"
+                                  BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="110" />
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}" IsEnabled="{x:Bind CanSelect}"
+                                          VerticalAlignment="Top" MinWidth="0" />
+
+                                <StackPanel Grid.Column="1" Spacing="2">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="нужен админ" Visibility="{x:Bind NeedsAdmin}"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="{x:Bind Description}" TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" />
+                                    <TextBlock Text="{x:Bind Warning}" TextWrapping="Wrap" Visibility="{x:Bind HasWarning}"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource SystemFillColorCautionBrush}" />
+                                    <TextBlock Text="{x:Bind Note, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="2" Text="{x:Bind SizeText, Mode=OneWay}" HorizontalAlignment="Right"
+                                           Style="{StaticResource SubtitleTextBlockStyle}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+
+            <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}"
+                       Text="Безопасность: удаляются только файлы внутри перечисленных папок; временные файлы — старше суток; занятые файлы пропускаются; ссылки на другие папки не открываются; кэш браузера не трогается, пока браузер открыт. Пароли, история и личные файлы не удаляются." />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

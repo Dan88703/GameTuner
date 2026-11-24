@@ -3,6 +3,19 @@
 All notable changes to GameTuner are listed here.
 The project follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
 
+## [1.3.0] — 2026-11-24
+
+### Added
+- **Disk cleanup page** — scan first, see the size of every category, tick what to clean,
+  and get the real freed space (measured on drive C:).
+  - Temporary files (user and Windows, older than 1 day), Windows Update download cache,
+    Delivery Optimization cache, browser caches (Chrome, Edge, Firefox, Opera, Brave — cache only),
+    crash dumps and error reports, Recycle Bin, GPU shader cache, Windows component store (DISM).
+  - Safety: only files inside known junk folders; symlinks/junctions are never followed;
+    locked files are skipped; browser caches are skipped while the browser is open;
+    Recycle Bin, shader cache and DISM are opt-in.
+  - System folders need admin mode; they stay visible but disabled otherwise.
+
 ## [1.2.0] — 2026-11-23
 
 ### Added

@@ -63,6 +63,12 @@ Any game can be added by its process name — for example Fortnite or Genshin Im
 - Modes: off / only on battery / always. Apps that need full power (e.g. a compiler or video editor) can be listed as exceptions.
 - Fully reversible: original power settings are saved first and restored when a game starts, when GameTuner exits, or after a crash.
 
+### Disk cleanup
+- Scan → choose → clean, with the size of every category and the **real** freed space at the end.
+- Cleans temp files, Windows Update cache, Delivery Optimization cache, browser caches (not passwords or history),
+  crash dumps, Recycle Bin, GPU shader cache and old Windows components (DISM).
+- Safe by design: only known junk folders, no following of symlinks, locked files skipped, risky items opt-in.
+
 ### Live monitoring
 - CPU and GPU load, RAM usage, battery and charger state — **no admin rights needed**.
 - CPU / GPU temperatures and clocks — in admin mode, via LibreHardwareMonitor.
@@ -133,13 +139,14 @@ and publish a release (`.github/workflows/release.yml`).
 ## How to use
 
 > **Note:** the interface is currently in Russian; English localization is on the [roadmap](#roadmap).
-> Names below are translated: *Overview* = «Обзор», *Games* = «Игры», *Charts* = «Графики», *Optimization* = «Оптимизация», *Settings* = «Настройки».
+> Names below are translated: *Overview* = «Обзор», *Games* = «Игры», *Charts* = «Графики», *Cleanup* = «Очистка», *Optimization* = «Оптимизация», *Settings* = «Настройки».
 
 1. **Overview** — check the detected hardware and the recommended graphics tier.
 2. **Games** — pick a preset (or keep *Auto*), expand *What will be changed*, and click **Apply**. **Undo** restores the previous config.
 3. **Charts** — watch load, temperatures and FPS live, or open a past game session.
-4. **Optimization** — boost power manually, toggle Game Mode, close heavy background apps.
-5. **Settings** — configure auto mode, autostart, tray behaviour and FPS capture.
+4. **Cleanup** — click **Scan**, review the categories, then **Clean selected**.
+5. **Optimization** — boost power manually, toggle Game Mode, close heavy background apps.
+6. **Settings** — configure auto mode, autostart, tray behaviour and FPS capture.
 
 ### Adding your own games to auto mode
 
@@ -207,6 +214,7 @@ src/
     Configs/                   Pure text editors: Valve KeyValues, key:value, XML
     Games/                     GameProfile base class + CS2 / Minecraft / GTA V
     Backup/                    Timestamped backups with manifest, restore, pruning
+    Cleanup/                   Disk cleanup targets with safe deletion rules
     Tuning/                    Power plans, Game Mode, processes, elevation
     Monitoring/                Sensor loop (basic + LibreHardwareMonitor), PresentMon FPS
     Automation/                Game watcher, auto mode, session history
@@ -264,6 +272,7 @@ All data is per user in `%LOCALAPPDATA%\GameTuner\`:
 - [ ] Automatic detection of installed games (Steam, Epic, EA, Xbox)
 - [x] Performance and temperature charts (1.1.0)
 - [x] Quiet mode outside games (1.2.0)
+- [x] Disk cleanup (1.3.0)
 - [ ] In-game FPS overlay
 - [ ] English / Polish / Russian UI localization
 

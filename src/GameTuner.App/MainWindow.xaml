@@ -52,6 +52,11 @@
                         <FontIcon Glyph="&#xE9D2;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Очистка" Tag="cleanup">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE74D;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Оптимизация" Tag="optimization">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE945;" />
