@@ -71,6 +71,13 @@
                     <Button Content="Перезапустить от администратора"
                             Visibility="{x:Bind ViewModel.IsNotElevated}"
                             Command="{x:Bind ViewModel.RestartAsAdminCommand}" />
+                    <InfoBar IsOpen="{x:Bind ViewModel.ShowPawnIoHint}" IsClosable="False" Severity="Warning"
+                             Title="Нужен драйвер PawnIO для температуры процессора"
+                             Message="Библиотека датчиков читает температуру CPU через бесплатный открытый драйвер PawnIO (он заменил старый WinRing0, который блокирует Защитник Windows). Скачай PawnIO_setup.exe, установи и перезапусти GameTuner. Пока его нет, показывается приблизительная температура ACPI, если ноутбук её отдаёт.">
+                        <InfoBar.ActionButton>
+                            <HyperlinkButton Content="Скачать PawnIO" NavigateUri="{x:Bind ViewModel.PawnIoUrl}" />
+                        </InfoBar.ActionButton>
+                    </InfoBar>
                     <TextBlock Text="{x:Bind ViewModel.PresentMonStatus, Mode=OneWay}" TextWrapping="Wrap"
                                Style="{StaticResource TileCaptionStyle}" Margin="0,8,0,0" />
                     <StackPanel Orientation="Horizontal" Spacing="12">

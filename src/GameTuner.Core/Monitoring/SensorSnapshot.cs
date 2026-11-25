@@ -10,6 +10,12 @@ public sealed record SensorSnapshot
 
     public double CpuLoad { get; init; }
     public double? CpuTempC { get; init; }
+
+    /// <summary>
+    /// True when CpuTempC comes from the ACPI thermal zone (no driver needed) rather
+    /// than the CPU's own sensor. Usually close to the real value, but less precise.
+    /// </summary>
+    public bool CpuTempIsAcpi { get; init; }
     public double? CpuClockMhz { get; init; }
 
     public double? GpuLoad { get; init; }

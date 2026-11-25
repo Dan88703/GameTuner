@@ -57,6 +57,11 @@
                         <FontIcon Glyph="&#xE74D;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Безопасность" Tag="security">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE83D;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Оптимизация" Tag="optimization">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE945;" />

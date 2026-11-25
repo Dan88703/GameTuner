@@ -23,6 +23,7 @@ public partial class SettingsViewModel : ObservableObject
 
     public SettingsViewModel(ISettingsService settings, IFpsMonitor fps, IDialogService dialogs, SystemProfileService profile)
     {
+        ShowPawnIoHint = IsElevated && !LhmSensorProvider.IsPawnIoInstalled();
         _ = LoadDeviceKindAsync(profile);
         _settings = settings;
         _fps = fps;
@@ -93,6 +94,10 @@ public partial class SettingsViewModel : ObservableObject
     public string ElevationText => IsElevated
         ? "GameTuner запущен от администратора: температуры, частоты и FPS доступны."
         : "Обычный режим. Температуры, частоты и счётчик FPS требуют прав администратора.";
+
+    /// <summary>Admin mode but no PawnIO driver: CPU temperatures can't be read precisely.</summary>
+    public bool ShowPawnIoHint { get; }
+    public Uri PawnIoUrl { get; } = new(LhmSensorProvider.PawnIoDownloadUrl);
 
     [ObservableProperty] private string _presentMonStatus = "";
     [ObservableProperty] private bool _canInstallPresentMon;

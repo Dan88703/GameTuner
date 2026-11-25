@@ -22,15 +22,17 @@ public partial class ChartsViewModel : ObservableObject
     private static readonly TimeSpan[] Ranges = { TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(10) };
 
     private readonly IMetricsHistory _history;
+    private readonly ISensorService _sensors;
     private readonly ISessionStore _sessions;
     private readonly DispatcherQueue _dispatcher;
     // Kept in a field so the timer can't be garbage-collected while the app runs.
     private readonly DispatcherQueueTimer _timer;
     private List<GameSessionRecord> _sessionList = new();
 
-    public ChartsViewModel(IMetricsHistory history, ISessionStore sessions)
+    public ChartsViewModel(IMetricsHistory history, ISessionStore sessions, ISensorService sensors)
     {
         _history = history;
+        _sensors = sensors;
         _sessions = sessions;
         _dispatcher = DispatcherQueue.GetForCurrentThread();
 
@@ -122,15 +124,15 @@ public partial class ChartsViewModel : ObservableObject
         TempChart = new ChartData(
             new[]
             {
-                Series("CPU", LineChart.Palette.Cpu, p => p.CpuTempC),
+                Series(_sensors.Latest.CpuTempIsAcpi ? "CPU (ACPI)" : "CPU", LineChart.Palette.Cpu, p => p.CpuTempC),
                 Series("GPU", LineChart.Palette.Gpu, p => p.GpuTempC)
             },
             tMin, tMax, "°", leftLabel, rightLabel,
-            Elevation.IsElevated
-                ? "Датчики температуры недоступны на этом ноутбуке"
-                : "Температуры доступны в режиме администратора (Обзор → «Перезапустить от администратора»)");
+            _sensors.TemperatureHint ?? "Нет данных");
         TempSummary = Summary(points, p => p.CpuTempC, "CPU", " °C") + "   " + Summary(points, p => p.GpuTempC, "GPU", " °C")
-                      + TemperatureWarning(temps);
+                      + TemperatureWarning(temps)
+                      // Explain why something is missing even when part of the data is there.
+                      + (_sensors.TemperatureHint is string hint && temps.Count > 0 ? "\n" + hint : "");
 
         // --- FPS: scale rounded up to a multiple of 30, at least 0–60 ---
         var fps = points.Select(p => p.Fps).OfType<double>().ToList();

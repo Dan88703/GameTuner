@@ -33,6 +33,16 @@ and an FPS counter show what is actually happening.
 
 ## Features
 
+### One-click "Improve my laptop"
+- A **health score** (0–100) on the Overview page from ~12 checks: free space, junk, antivirus, autostart,
+  GPU driver age, time since restart, idle temperature, RAM, Game Mode, quiet mode, GPU scheduling, HDD.
+- **Improve** applies only safe, reversible fixes; the rest is clear advice with links.
+
+### Security
+- **Microsoft Defender** status, signature update, quick / full scan, found threats and removal — all done by
+  Defender's own engine; GameTuner is the remote control, not an antivirus.
+- **Autostart review** with warnings for typical junk/malware signs; switching entries off works like Task Manager.
+
 ### Hardware analysis
 - Detects CPU, GPU(s) with real VRAM (read from the registry, not the 4 GB-capped WMI value), RAM, SSD/HDD, screen resolution and refresh rate.
 - Scores GPU, CPU and RAM and turns them into one **performance tier**: Low / Medium / High / Ultra.
@@ -151,14 +161,15 @@ and publish a release (`.github/workflows/release.yml`).
 ## How to use
 
 > **Note:** the interface is currently in Russian; English localization is on the [roadmap](#roadmap).
-> Names below are translated: *Overview* = «Обзор», *Games* = «Игры», *Charts* = «Графики», *Cleanup* = «Очистка», *Optimization* = «Оптимизация», *Settings* = «Настройки».
+> Names below are translated: *Overview* = «Обзор», *Games* = «Игры», *Charts* = «Графики», *Cleanup* = «Очистка», *Security* = «Безопасность», *Optimization* = «Оптимизация», *Settings* = «Настройки».
 
-1. **Overview** — check the detected hardware and the recommended graphics tier.
+1. **Overview** — see the health score and press **Improve my laptop**; check the detected hardware and recommended graphics tier.
 2. **Games** — pick a preset (or keep *Auto*), expand *What will be changed*, and click **Apply**. **Undo** restores the previous config.
 3. **Charts** — watch load, temperatures and FPS live, or open a past game session.
 4. **Cleanup** — click **Scan**, review the categories, then **Clean selected**.
-5. **Optimization** — boost power manually, toggle Game Mode, close heavy background apps.
-6. **Settings** — configure auto mode, autostart, tray behaviour and FPS capture.
+5. **Security** — check Defender, run a scan, review autostart entries.
+6. **Optimization** — boost power manually, toggle Game Mode, close heavy background apps.
+7. **Settings** — configure auto mode, autostart, tray behaviour and FPS capture.
 
 ### Adding your own games to auto mode
 
@@ -183,7 +194,7 @@ rights, and are enabled with **Restart as administrator** (Overview or Settings)
 
 | Feature | Why admin is needed |
 |---|---|
-| CPU / GPU temperatures and clocks | LibreHardwareMonitor reads hardware sensors through a kernel driver |
+| CPU / GPU temperatures and clocks | LibreHardwareMonitor reads hardware sensors through a kernel driver ([PawnIO](https://github.com/namazso/PawnIO.Setup/releases), installed once) |
 | FPS counter | PresentMon listens to Windows ETW graphics events |
 
 **PresentMon** is not bundled. On first use, *Settings → Download PresentMon*
@@ -211,7 +222,7 @@ while a game is running:
 | Build error *"file is being used by another process: GameTuner.Core.dll"* | GameTuner is still running (maybe in the tray). Right-click the tray icon → **Exit**, or end `GameTuner.exe` in Task Manager. |
 | Game is not detected | Make sure the exact process name is in *Settings → Other games* and click outside the text box to save. Detection runs every 3 seconds. |
 | FPS shows a status instead of a number | Read the status text under FPS: it says whether PresentMon is missing, needs admin, is waiting for frames, or stopped (with its exit code). Restart the game after switching to admin mode. |
-| *"Temperature sensor unavailable"* | LibreHardwareMonitor's driver could not load (often blocked by Windows security). CPU/GPU load still works. |
+| No CPU temperature in admin mode | Install the free [PawnIO](https://github.com/namazso/PawnIO.Setup/releases) driver (Settings shows a button) and restart GameTuner. LibreHardwareMonitor uses it to read CPU sensors. Until then an approximate ACPI temperature is shown if the laptop provides one. |
 | Something else | Logs are in `%LOCALAPPDATA%\GameTuner\logs\`. Please attach the latest log to an issue. |
 
 ---
@@ -227,6 +238,8 @@ src/
     Games/                     GameProfile base class + CS2 / Minecraft / GTA V
     Backup/                    Timestamped backups with manifest, restore, pruning
     Cleanup/                   Disk cleanup targets with safe deletion rules
+    Security/                  Microsoft Defender front-end, autostart manager + suspicion rules
+    Health/                    Health check, score and one-click improve
     Tuning/                    Power plans, Game Mode, processes, elevation
     Monitoring/                Sensor loop (basic + LibreHardwareMonitor), PresentMon FPS
     Automation/                Game watcher, auto mode, session history
@@ -285,6 +298,7 @@ All data is per user in `%LOCALAPPDATA%\GameTuner\`:
 - [x] Performance and temperature charts (1.1.0)
 - [x] Quiet mode outside games (1.2.0)
 - [x] Disk cleanup (1.3.0)
+- [x] Health check, one-click improve, Defender & autostart (2.0.0)
 - [ ] In-game FPS overlay
 - [ ] English / Polish / Russian UI localization
 

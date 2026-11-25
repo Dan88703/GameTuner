@@ -1,4 +1,5 @@
 using LibreHardwareMonitor.Hardware;
+using Microsoft.Win32;
 
 namespace GameTuner.Core.Monitoring;
 
@@ -21,6 +22,25 @@ public sealed class LhmSensorProvider : ISensorProvider
             IsGpuEnabled = true
         };
         _computer.Open(); // may throw if the driver is blocked — caller falls back
+    }
+
+    public const string PawnIoDownloadUrl = "https://github.com/namazso/PawnIO.Setup/releases";
+
+    /// <summary>
+    /// LibreHardwareMonitor 0.9.5+ reads CPU sensors through the PawnIO driver
+    /// (it replaced the old WinRing0 driver, which Windows Defender now blocks).
+    /// PawnIO is NOT bundled with the library: the user installs it once. It
+    /// registers a Windows service named "PawnIO", so the service key tells us
+    /// whether it's installed.
+    /// </summary>
+    public static bool IsPawnIoInstalled()
+    {
+        try
+        {
+            using var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\PawnIO");
+            return key != null;
+        }
+        catch (Exception) { return false; }
     }
 
     public SensorSnapshot Read()

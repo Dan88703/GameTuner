@@ -46,4 +46,7 @@ public sealed class GpuInfo
     public double VramGb { get; set; }
     public bool IsIntegrated { get; set; }
     public string DriverVersion { get; set; } = "";
+
+    /// <summary>Release date of the installed driver (null if unknown).</summary>
+    public DateTime? DriverDate { get; set; }
 }

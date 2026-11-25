@@ -2,6 +2,8 @@ using GameTuner.Core.Automation;
 using GameTuner.Core.Backup;
 using GameTuner.Core.Cleanup;
 using GameTuner.Core.Games;
+using GameTuner.Core.Health;
+using GameTuner.Core.Security;
 using GameTuner.Core.Hardware;
 using GameTuner.Core.Monitoring;
 using GameTuner.Core.Performance;
@@ -34,6 +36,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IProcessManager, ProcessManager>();
         services.AddSingleton<IQuietModeController, QuietModeController>();
         services.AddSingleton<IDiskCleanupService, DiskCleanupService>();
+        services.AddSingleton<IDefenderService, DefenderService>();
+        services.AddSingleton<IStartupManager, StartupManager>();
+        services.AddSingleton<IHealthCheckService, HealthCheckService>();
 
         services.AddSingleton<ISensorService, SensorService>();
         services.AddSingleton<IFpsMonitor, PresentMonService>();

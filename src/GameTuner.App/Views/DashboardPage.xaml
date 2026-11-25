@@ -20,6 +20,76 @@
                 </InfoBar.ActionButton>
             </InfoBar>
 
+            <!-- Health check + one-click improve -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="12">
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Score ring -->
+                        <Grid Width="72" Height="72">
+                            <ProgressRing IsIndeterminate="False" Value="{x:Bind ViewModel.HealthScore, Mode=OneWay}"
+                                          Maximum="100" Width="72" Height="72" />
+                            <TextBlock Text="{x:Bind ViewModel.HealthScoreText, Mode=OneWay}" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{x:Bind ViewModel.HealthTitle, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" />
+                            <TextBlock Text="{x:Bind ViewModel.HealthSummary, Mode=OneWay}" TextWrapping="Wrap" />
+                            <TextBlock Text="{x:Bind ViewModel.HealthProgress, Mode=OneWay}" Style="{StaticResource TileCaptionStyle}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <ProgressRing IsActive="{x:Bind ViewModel.IsHealthBusy, Mode=OneWay}" Width="20" Height="20" />
+                            <Button Content="Проверить снова" Command="{x:Bind ViewModel.CheckHealthCommand}" />
+                            <Button Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.ImproveCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE945;" FontSize="14" />
+                                    <TextBlock Text="Улучшить ноутбук" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <Expander Header="Подробности проверки" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.HealthItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:HealthRow">
+                                    <Grid ColumnSpacing="12" Padding="0,8" BorderThickness="0,0,0,1"
+                                          BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Glyph="{x:Bind Glyph}" Foreground="{x:Bind IconBrush}" FontSize="16"
+                                                  VerticalAlignment="Top" Margin="0,2,0,0" />
+                                        <StackPanel Grid.Column="1" Spacing="2">
+                                            <TextBlock>
+                                                <Run Text="{x:Bind Title}" FontWeight="SemiBold" />
+                                                <Run Text=" — " />
+                                                <Run Text="{x:Bind Detail}" />
+                                            </TextBlock>
+                                            <TextBlock Text="{x:Bind Fix}" Visibility="{x:Bind HasFix}" TextWrapping="Wrap"
+                                                       Style="{StaticResource TileCaptionStyle}"
+                                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                                            <TextBlock Text="{x:Bind Advice}" Visibility="{x:Bind HasAdvice}" TextWrapping="Wrap"
+                                                       Style="{StaticResource TileCaptionStyle}" />
+                                            <HyperlinkButton Content="{x:Bind LinkText}" NavigateUri="{x:Bind Link}"
+                                                             Visibility="{x:Bind HasLink}" Padding="0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander>
+                </StackPanel>
+            </Border>
+
             <!-- Active game -->
             <Border Style="{StaticResource CardStyle}">
                 <Grid ColumnSpacing="24">

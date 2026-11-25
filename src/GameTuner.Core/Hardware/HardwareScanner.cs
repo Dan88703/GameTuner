@@ -79,7 +79,7 @@ public sealed class HardwareScanner : IHardwareScanner
         try
         {
             using var searcher = new ManagementObjectSearcher(
-                "SELECT Name, AdapterRAM, DriverVersion, CurrentHorizontalResolution, CurrentVerticalResolution, CurrentRefreshRate FROM Win32_VideoController");
+                "SELECT Name, AdapterRAM, DriverVersion, DriverDate, CurrentHorizontalResolution, CurrentVerticalResolution, CurrentRefreshRate FROM Win32_VideoController");
             foreach (ManagementObject gpu in searcher.Get())
             {
                 string name = (gpu["Name"] as string ?? "Unknown").Trim();
@@ -101,6 +101,7 @@ public sealed class HardwareScanner : IHardwareScanner
                     Name = name,
                     VramGb = Math.Round(vramGb, 1),
                     DriverVersion = gpu["DriverVersion"] as string ?? "",
+                    DriverDate = ParseWmiDate(gpu["DriverDate"] as string),
                     IsIntegrated = IsIntegratedGpu(name)
                 });
 
@@ -116,6 +117,14 @@ public sealed class HardwareScanner : IHardwareScanner
             }
         }
         catch (Exception ex) { _log.LogWarning(ex, "GPU query failed"); }
+    }
+
+    /// <summary>WMI dates look like "20250312000000.000000-000" (DMTF format).</summary>
+    internal static DateTime? ParseWmiDate(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return null;
+        try { return ManagementDateTimeConverter.ToDateTime(value); }
+        catch (Exception) { return null; }
     }
 
     /// <summary>Returns DriverDesc -> VRAM bytes for every adapter in the registry.</summary>

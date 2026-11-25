@@ -12,6 +12,12 @@ public interface ISensorService : IDisposable
     /// <summary>True when temperatures are available (running as admin and LHM loaded).</summary>
     bool HasDetailedSensors { get; }
 
+    /// <summary>
+    /// Why precise temperatures are missing, as an instruction for the user;
+    /// null when everything works.
+    /// </summary>
+    string? TemperatureHint { get; }
+
     /// <summary>Raised on a background thread after every reading.</summary>
     event EventHandler<SensorSnapshot>? Updated;
 
@@ -47,6 +53,15 @@ public sealed class SensorService : ISensorService
 
     public SensorSnapshot Latest { get; private set; } = SensorSnapshot.Empty;
     public bool HasDetailedSensors => _lhm != null;
+
+    public string? TemperatureHint =>
+        !Elevation.IsElevated
+            ? "Точные температуры доступны в режиме администратора."
+            : !LhmSensorProvider.IsPawnIoInstalled()
+                ? "Для точной температуры процессора нужен бесплатный драйвер PawnIO: Настройки → «Мониторинг и FPS» → «Скачать PawnIO», потом перезапусти GameTuner."
+                : Latest.CpuTempC == null && Latest.GpuTempC == null
+                    ? "Датчики температуры этого устройства пока не поддерживаются."
+                    : null;
     public event EventHandler<SensorSnapshot>? Updated;
 
     public void Start()
@@ -113,7 +128,9 @@ public sealed class SensorService : ISensorService
         return basic with
         {
             CpuLoad = detailed.CpuLoad > 0 ? detailed.CpuLoad : basic.CpuLoad,
-            CpuTempC = detailed.CpuTempC,
+            // Precise CPU sensor if LHM has it, otherwise keep the ACPI fallback.
+            CpuTempC = detailed.CpuTempC ?? basic.CpuTempC,
+            CpuTempIsAcpi = detailed.CpuTempC == null && basic.CpuTempIsAcpi,
             CpuClockMhz = detailed.CpuClockMhz,
             GpuLoad = detailed.GpuLoad ?? basic.GpuLoad,
             GpuTempC = detailed.GpuTempC,

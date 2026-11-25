@@ -4,12 +4,54 @@ using CommunityToolkit.Mvvm.Input;
 using GameTuner.App.Services;
 using GameTuner.Core.Automation;
 using GameTuner.Core.Games;
+using GameTuner.Core.Health;
+using GameTuner.Core.Cleanup;
 using GameTuner.Core.Hardware;
 using GameTuner.Core.Monitoring;
 using GameTuner.Core.Tuning;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 
 namespace GameTuner.App.ViewModels;
+
+/// <summary>One line of the health report on the Overview page.</summary>
+public sealed class HealthRow
+{
+    public HealthRow(HealthItem item)
+    {
+        Title = item.Title;
+        Detail = item.Detail;
+        Advice = item.Advice ?? "";
+        Fix = item.CanAutoFix && item.Status != HealthStatus.Ok ? "Исправится кнопкой «Улучшить»: " + item.FixDescription : "";
+        LinkText = item.LinkText ?? "";
+        Link = item.Link;
+
+        // Segoe Fluent icons + Windows status colours (they follow light/dark theme).
+        (Glyph, string brushKey) = item.Status switch
+        {
+            HealthStatus.Ok => ("\uE73E", "SystemFillColorSuccessBrush"),
+            HealthStatus.Info => ("\uE946", "SystemFillColorAttentionBrush"),
+            HealthStatus.Warning => ("\uE7BA", "SystemFillColorCautionBrush"),
+            _ => ("\uEA39", "SystemFillColorCriticalBrush")
+        };
+        IconBrush = Application.Current.Resources.TryGetValue(brushKey, out object? b) && b is Brush brush
+            ? brush
+            : new SolidColorBrush(Microsoft.UI.Colors.Gray);
+    }
+
+    public string Title { get; }
+    public string Detail { get; }
+    public string Advice { get; }
+    public bool HasAdvice => Advice.Length > 0;
+    public string Fix { get; }
+    public bool HasFix => Fix.Length > 0;
+    public string LinkText { get; }
+    public Uri? Link { get; }
+    public bool HasLink => Link != null;
+    public string Glyph { get; }
+    public Brush IconBrush { get; }
+}
 
 /// <summary>One row in "Последние сессии".</summary>
 public sealed record SessionRow(string Game, string When, string Duration, string Fps, string Temps);
@@ -28,9 +70,18 @@ public partial class DashboardViewModel : ObservableObject
     private readonly DispatcherQueue _dispatcher;
     private readonly DispatcherQueueTimer _timer;
 
+    private readonly IHealthCheckService _health;
+    private readonly IDialogService _dialogs;
+    private readonly SystemProfileService _profile;
+    private HealthReport? _report;
+
     public DashboardViewModel(SystemProfileService profile, ISensorService sensors, IFpsMonitor fps,
-                              IAutoModeService autoMode, ISessionStore sessions)
+                              IAutoModeService autoMode, ISessionStore sessions,
+                              IHealthCheckService health, IDialogService dialogs)
     {
+        _health = health;
+        _dialogs = dialogs;
+        _profile = profile;
         _sensors = sensors;
         _fps = fps;
         _autoMode = autoMode;
@@ -52,6 +103,96 @@ public partial class DashboardViewModel : ObservableObject
         RefreshGame();
         RefreshSessions();
         _ = LoadHardwareAsync(profile);
+        _ = InitialHealthCheckAsync();
+    }
+
+    /// <summary>Waits a few seconds after start so the sensors have real readings (RAM, temperature).</summary>
+    private async Task InitialHealthCheckAsync()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(4));
+        await CheckHealthAsync();
+    }
+
+    // ---------- Health / "Improve" ----------
+    public ObservableCollection<HealthRow> HealthItems { get; } = new();
+    // Two forms of the same score: double for the ProgressRing, text for the label
+    // (x:Bind does not convert between types by itself).
+    [ObservableProperty] private double _healthScore;
+    [ObservableProperty] private string _healthScoreText = "…";
+    [ObservableProperty] private string _healthTitle = "Проверяю ноутбук…";
+    [ObservableProperty] private string _healthSummary = "";
+    [ObservableProperty] private string _healthProgress = "";
+    [ObservableProperty, NotifyCanExecuteChangedFor(nameof(ImproveCommand), nameof(CheckHealthCommand))]
+    private bool _isHealthBusy;
+    [ObservableProperty, NotifyCanExecuteChangedFor(nameof(ImproveCommand))] private bool _hasFixes;
+
+    private bool CanCheck() => !IsHealthBusy;
+    private bool CanImprove() => !IsHealthBusy && HasFixes;
+
+    [RelayCommand(CanExecute = nameof(CanCheck))]
+    private async Task CheckHealthAsync()
+    {
+        IsHealthBusy = true;
+        try
+        {
+            var (info, _) = await _profile.GetAsync();
+            var progress = new Progress<string>(s => HealthProgress = s);
+            _report = await _health.CheckAsync(info, progress);
+
+            HealthItems.Clear();
+            foreach (var item in _report.Items) HealthItems.Add(new HealthRow(item));
+
+            HealthScore = _report.Score;
+            HealthScoreText = _report.Score.ToString();
+            int problems = _report.Items.Count(i => i.Status >= HealthStatus.Warning);
+            HealthTitle = _report.Score switch
+            {
+                >= 90 => $"Отличное состояние · {_report.Score}/100",
+                >= 70 => $"Хорошее состояние · {_report.Score}/100",
+                >= 50 => $"Есть что улучшить · {_report.Score}/100",
+                _ => $"Нужно внимание · {_report.Score}/100"
+            };
+            HasFixes = _report.FixableCount > 0;
+            HealthSummary = HasFixes
+                ? $"Можно исправить автоматически: {_report.FixableCount}. Требуют внимания: {problems}."
+                : problems > 0 ? $"Требуют внимания: {problems} — смотри советы ниже." : "Всё в порядке 👍";
+            HealthProgress = $"Проверено {DateTime.Now:HH:mm}";
+        }
+        finally
+        {
+            IsHealthBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanImprove))]
+    private async Task ImproveAsync()
+    {
+        if (_report == null) return;
+        var fixes = _report.Items.Where(i => i.CanAutoFix && i.Status != HealthStatus.Ok)
+            .Select(i => "• " + i.FixDescription).ToList();
+        if (!await _dialogs.ConfirmAsync("Улучшить ноутбук?",
+                "GameTuner сделает:\n" + string.Join("\n", fixes) +
+                "\n\nВсё это безопасно. Остальное — советы, их решаешь ты.", "Улучшить"))
+            return;
+
+        IsHealthBusy = true;
+        ImproveResult result;
+        try
+        {
+            var progress = new Progress<string>(s => HealthProgress = s);
+            result = await _health.ImproveAsync(_report, progress);
+        }
+        finally
+        {
+            IsHealthBusy = false;
+        }
+
+        string text = result.Done.Count > 0 ? "Сделано:\n" + string.Join("\n", result.Done.Select(d => "✔ " + d)) : "Ничего не изменено.";
+        if (result.Failed.Count > 0) text += "\n\nНе получилось:\n" + string.Join("\n", result.Failed.Select(f => "✖ " + f));
+        if (result.FreedBytes > 0) text += $"\n\nОсвобождено на диске: {ByteSize.Format(result.FreedBytes)}";
+        await _dialogs.ShowAsync("Готово", text);
+
+        await CheckHealthAsync();   // show the new state
     }
 
     // ---------- Hardware ----------
@@ -130,11 +271,8 @@ public partial class DashboardViewModel : ObservableObject
         CpuLoad = s.CpuLoad;
         CpuLoadText = $"{s.CpuLoad:0}%";
         CpuDetailsText = JoinParts(
-            s.CpuTempC is double ct ? $"{ct:0} °C" : null,
-            s.CpuClockMhz is double cc ? $"{cc / 1000:0.0} ГГц" : null,
-            IsElevated
-                ? (s.CpuTempC == null ? "датчик температуры недоступен" : null)
-                : "температура — в режиме админа");
+            s.CpuTempC is double ct ? $"{ct:0} °C" + (s.CpuTempIsAcpi ? " (ACPI)" : "") : "нет температуры",
+            s.CpuClockMhz is double cc ? $"{cc / 1000:0.0} ГГц" : null);
 
         GpuLoad = s.GpuLoad ?? 0;
         GpuLoadText = s.GpuLoad is double gl ? $"{gl:0}%" : "—";

@@ -11,6 +11,7 @@ namespace GameTuner.Core.Monitoring;
 public sealed class BasicSensorProvider : ISensorProvider
 {
     private readonly GpuEngineCounter _gpu = new();
+    private readonly ThermalZoneCounter _thermal = new();
     private ulong _prevIdle, _prevKernel, _prevUser;
 
     public SensorSnapshot Read()
@@ -18,9 +19,12 @@ public sealed class BasicSensorProvider : ISensorProvider
         double ramUsed = ReadMemory(out double ramTotal, out int ramPercent);
         bool onBattery = ReadPower(out int battery);
 
+        double? acpiTemp = _thermal.Read();
         return new SensorSnapshot
         {
             CpuLoad = ReadCpuLoad(),
+            CpuTempC = acpiTemp,
+            CpuTempIsAcpi = acpiTemp.HasValue,
             GpuLoad = _gpu.Read(),
             RamUsedGb = ramUsed,
             RamTotalGb = ramTotal,
@@ -77,7 +81,11 @@ public sealed class BasicSensorProvider : ISensorProvider
         return status.ACLineStatus == 0;
     }
 
-    public void Dispose() => _gpu.Dispose();
+    public void Dispose()
+    {
+        _gpu.Dispose();
+        _thermal.Dispose();
+    }
 }
 
 /// <summary>
@@ -155,5 +163,77 @@ internal sealed class GpuEngineCounter : IDisposable
     {
         foreach (var c in _counters.Values) c.Dispose();
         _counters.Clear();
+    }
+}
+
+/// <summary>
+/// Fallback temperature from the ACPI "thermal zones" — the sensors the laptop's
+/// firmware uses to decide when to spin the fans. Windows exposes them as the
+/// "Thermal Zone Information" performance counters, readable WITHOUT admin
+/// rights or extra drivers.
+///
+/// They are not the CPU's own core sensor, but on most laptops the hottest zone
+/// sits right next to the CPU and follows it closely. Some PCs report a fake
+/// constant (often 27.8 °C) or nothing — those values are filtered out.
+/// </summary>
+internal sealed class ThermalZoneCounter : IDisposable
+{
+    private const string Category = "Thermal Zone Information";
+    private List<PerformanceCounter>? _counters;
+    private bool _unavailable;
+    private readonly Queue<double> _recent = new();
+
+    public double? Read()
+    {
+        if (_unavailable) return null;
+        try
+        {
+            _counters ??= CreateCounters();
+            if (_counters.Count == 0) { _unavailable = true; return null; }
+
+            double max = _counters.Select(ReadCelsius).Max();
+            if (!IsPlausible(max)) return null;
+
+            // A value that never changes for minutes is a firmware placeholder, not a sensor.
+            _recent.Enqueue(max);
+            if (_recent.Count > 120) _recent.Dequeue();
+            if (_recent.Count == 120 && _recent.All(v => v == max)) return null;
+
+            return Math.Round(max, 1);
+        }
+        catch (Exception)
+        {
+            _unavailable = true;
+            return null;
+        }
+    }
+
+    internal static bool IsPlausible(double celsius) => celsius is > 20 and < 115;
+
+    private static List<PerformanceCounter> CreateCounters()
+    {
+        var category = new PerformanceCounterCategory(Category);
+        // "High Precision Temperature" (tenths of a kelvin) exists on Windows 10 1903+;
+        // older systems only have "Temperature" (whole kelvins).
+        bool highPrecision = category.CounterExists("High Precision Temperature");
+        string counterName = highPrecision ? "High Precision Temperature" : "Temperature";
+
+        return category.GetInstanceNames()
+            .Select(instance => new PerformanceCounter(Category, counterName, instance, readOnly: true))
+            .ToList();
+    }
+
+    /// <summary>Kelvin (or tenths of a kelvin) → °C.</summary>
+    private static double ReadCelsius(PerformanceCounter counter)
+    {
+        double raw = counter.NextValue();
+        double kelvin = counter.CounterName.StartsWith("High", StringComparison.Ordinal) ? raw / 10 : raw;
+        return kelvin - 273.15;
+    }
+
+    public void Dispose()
+    {
+        if (_counters == null) return;
+        foreach (var c in _counters) c.Dispose();
     }
 }

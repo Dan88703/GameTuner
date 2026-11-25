@@ -3,6 +3,34 @@
 All notable changes to GameTuner are listed here.
 The project follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
 
+## [2.0.0] — 2026-11-25
+
+### Added
+- **"Improve my laptop" button** on the Overview page with a **health score** (0–100).
+  A health check rates ~12 areas — free space, junk, antivirus, autostart, GPU driver age,
+  uptime, idle temperature, RAM, Game Mode, quiet mode, GPU scheduling, HDD — and
+  one click applies only the safe fixes (junk cleanup, Game Mode, quiet mode, Defender update).
+  Everything else is shown as advice with links (e.g. to the AMD / NVIDIA / Intel driver pages).
+- **Security page.**
+  - **Microsoft Defender** front-end: protection status (or the third-party antivirus in use),
+    signature update, quick and full scan with cancel, list of found threats, removal through Defender.
+    GameTuner never decides on its own what is malware.
+  - **Autostart review**: all Run keys and Startup folders, publisher from the digital signature,
+    warnings for missing files, files in Temp, script hosts, encoded PowerShell, unsigned files in AppData.
+    Entries are switched on/off exactly like Task Manager does (StartupApproved), so nothing is deleted.
+
+## [1.4.1] — 2026-11-24
+
+### Fixed
+- **CPU temperature missing in admin mode.** LibreHardwareMonitor 0.9.5+ reads CPU sensors through the
+  PawnIO driver, which must be installed separately. GameTuner now detects a missing PawnIO and shows
+  a "Download PawnIO" button in Settings, instead of a vague "sensors unavailable".
+
+### Added
+- **ACPI temperature fallback** — when the precise CPU sensor isn't available (no admin, no PawnIO),
+  the laptop's ACPI thermal zone is used (marked "ACPI"). Fake constant values are filtered out.
+- Temperature charts and the Overview page explain exactly what is missing.
+
 ## [1.4.0] — 2026-11-24
 
 ### Added
