@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
+    Background="{StaticResource GtBlackBrush}"
     x:Class="GameTuner.App.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -7,12 +8,15 @@
     <ScrollViewer>
         <StackPanel Padding="32,24,32,32" Spacing="16" MaxWidth="1200">
 
-            <TextBlock Text="Настройки" Style="{StaticResource PageTitleStyle}" />
+            <StackPanel Spacing="8" Margin="0,0,0,12">
+                <TextBlock Text="Настройки" Style="{StaticResource PageTitleStyle}" />
+                <Rectangle Width="56" Height="3" RadiusX="1.5" RadiusY="1.5" HorizontalAlignment="Left" Fill="{StaticResource GtRedBrush}" />
+            </StackPanel>
 
             <!-- Auto mode -->
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="4">
-                    <TextBlock Text="Авто-режим" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="Авто-режим" Style="{StaticResource SectionTitleStyle}" />
                     <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" Margin="0,0,0,8"
                                Text="Когда запускается известная игра, GameTuner сам включает игровой режим, а после выхода из игры всё возвращает и сохраняет статистику сессии." />
                     <ToggleSwitch Header="Включить авто-режим" IsOn="{x:Bind ViewModel.AutoModeEnabled, Mode=TwoWay}" />
@@ -44,7 +48,7 @@
             <!-- Quiet mode -->
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="4">
-                    <TextBlock Text="Тихий режим вне игр" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="Тихий режим вне игр" Style="{StaticResource SectionTitleStyle}" />
                     <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}" Margin="0,0,0,8"
                                Text="Когда игра не запущена, процессор работает без турбо-буста: ноутбук холоднее, тише и дольше живёт от батареи. Это безопасно — тяжёлые задачи просто выполняются чуть дольше. Во время игр и при выходе из GameTuner всё возвращается как было." />
                     <RadioButtons SelectedIndex="{x:Bind ViewModel.QuietModeIndex, Mode=TwoWay}">
@@ -66,7 +70,7 @@
             <!-- Monitoring -->
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Мониторинг и FPS" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="Мониторинг и FPS" Style="{StaticResource SectionTitleStyle}" />
                     <TextBlock Text="{x:Bind ViewModel.ElevationText}" TextWrapping="Wrap" />
                     <Button Content="Перезапустить от администратора"
                             Visibility="{x:Bind ViewModel.IsNotElevated}"
@@ -92,7 +96,7 @@
             <!-- App -->
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="4">
-                    <TextBlock Text="Приложение" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="Приложение" Style="{StaticResource SectionTitleStyle}" />
                     <InfoBar IsOpen="{x:Bind ViewModel.IsRunningFromBuildFolder}" IsClosable="False" Severity="Warning"
                              Title="Запущено из папки сборки"
                              Message="Ярлык и автозапуск будут указывать на bin\Debug и сломаются после очистки проекта. Установи GameTuner скриптом install-local.ps1 и включи их уже в установленной версии."
@@ -111,7 +115,7 @@
             <!-- About -->
             <Border Style="{StaticResource CardStyle}">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="{x:Bind ViewModel.Version}" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.Version}" Style="{StaticResource SectionTitleStyle}" />
                     <TextBlock TextWrapping="Wrap" Style="{StaticResource TileCaptionStyle}">
                         <Run Text="Данные, бэкапы и логи: " />
                         <Run Text="{x:Bind ViewModel.DataFolder}" />

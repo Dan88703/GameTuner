@@ -5,21 +5,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="GameTuner">
 
-    <Window.SystemBackdrop>
-        <MicaBackdrop />
-    </Window.SystemBackdrop>
-
-    <Grid>
+    <!-- Solid black instead of the Windows 11 Mica material: the app has its own look. -->
+    <Grid Background="{StaticResource GtBlackBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- Custom title bar (the content extends into it, see MainWindow.xaml.cs) -->
-        <Grid x:Name="AppTitleBar" Padding="16,0,0,0">
+        <Grid x:Name="AppTitleBar" Padding="14,0,0,0" Background="{StaticResource GtBlackBrush}">
             <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                <FontIcon Glyph="&#xEC4A;" FontSize="16" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                <TextBlock Text="GameTuner" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+                <!-- Logo: red tile with a white gauge glyph -->
+                <Border Width="22" Height="22" CornerRadius="5" Background="{StaticResource GtRedBrush}">
+                    <FontIcon Glyph="&#xEC4A;" FontSize="13" Foreground="{StaticResource GtWhiteBrush}" />
+                </Border>
+                <TextBlock VerticalAlignment="Center" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="14" CharacterSpacing="60">
+                    <Run Text="GAME" Foreground="{StaticResource GtWhiteBrush}" /><Run Text="TUNER" Foreground="{StaticResource GtRedBrush}" />
+                </TextBlock>
                 <TextBlock x:Name="AdminBadge" Text="администратор" Visibility="Collapsed"
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource SystemFillColorCautionBrush}" VerticalAlignment="Center" />
@@ -35,6 +37,15 @@
             OpenPaneLength="220"
             Loaded="Nav_Loaded"
             SelectionChanged="Nav_SelectionChanged">
+
+            <!-- Resources set on the control itself win over everything else. -->
+            <NavigationView.Resources>
+                <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#FF000000" />
+                <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="#FF000000" />
+                <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF000000" />
+                <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="#33FFFFFF" />
+                <Thickness x:Key="NavigationViewContentGridBorderThickness">1,1,0,0</Thickness>
+            </NavigationView.Resources>
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Обзор" Tag="dashboard">

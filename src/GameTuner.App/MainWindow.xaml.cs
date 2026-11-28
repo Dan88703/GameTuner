@@ -22,6 +22,7 @@ public sealed partial class MainWindow : Window
         SetTitleBar(AppTitleBar);
 
         AppWindow.Resize(new SizeInt32(1200, 820));
+        StyleCaptionButtons();
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
         AppWindow.Closing += OnClosing;
 
@@ -33,6 +34,24 @@ public sealed partial class MainWindow : Window
 
         ContentFrame.Navigate(typeof(DashboardPage));
         Nav.SelectedItem = Nav.MenuItems[0];
+    }
+
+    /// <summary>
+    /// The minimize / maximize / close buttons are drawn by Windows, not by XAML,
+    /// so their colours are set through the AppWindow title bar API.
+    /// </summary>
+    private void StyleCaptionButtons()
+    {
+        var bar = AppWindow.TitleBar;
+        var white = Microsoft.UI.Colors.White;
+        bar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
+        bar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+        bar.ButtonForegroundColor = white;
+        bar.ButtonInactiveForegroundColor = Microsoft.UI.ColorHelper.FromArgb(255, 124, 124, 140);
+        bar.ButtonHoverBackgroundColor = Microsoft.UI.ColorHelper.FromArgb(255, 38, 38, 49);
+        bar.ButtonHoverForegroundColor = white;
+        bar.ButtonPressedBackgroundColor = Microsoft.UI.ColorHelper.FromArgb(255, 230, 57, 70);   // red
+        bar.ButtonPressedForegroundColor = white;
     }
 
     /// <summary>Brings the window back from the tray (or from behind other windows).</summary>

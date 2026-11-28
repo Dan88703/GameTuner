@@ -3,6 +3,16 @@
 All notable changes to GameTuner are listed here.
 The project follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
 
+## [2.1.0] — 2026-11-27
+
+### Changed
+- **New look**: own theme instead of the default Windows 11 style — pure black background,
+  every card outlined with a 2 px white border, red primary accent, blue secondary accent,
+  white text; Bahnschrift for titles and big numbers;
+  red underline under page titles; branded "GAMETUNER" title bar with themed window buttons.
+- Chart colours: CPU red, GPU blue, RAM white, FPS amber. Load bars on the Overview match them.
+- New app icon in the same palette.
+
 ## [2.0.0] — 2026-11-25
 
 ### Added

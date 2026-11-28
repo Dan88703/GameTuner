@@ -180,12 +180,12 @@ public sealed class LineChart : UserControl
             ? brush
             : new SolidColorBrush(fallback);
 
-    /// <summary>Fixed series colours, readable on both dark and light backgrounds.</summary>
+    /// <summary>Series colours of the GameTuner theme (on a black background).</summary>
     public static class Palette
     {
-        public static readonly Color Cpu = ColorHelper.FromArgb(255, 76, 194, 255);   // blue
-        public static readonly Color Gpu = ColorHelper.FromArgb(255, 255, 140, 66);   // orange
-        public static readonly Color Ram = ColorHelper.FromArgb(255, 179, 136, 255);  // purple
-        public static readonly Color Fps = ColorHelper.FromArgb(255, 108, 203, 95);   // green
+        public static readonly Color Cpu = ColorHelper.FromArgb(255, 255, 59, 78);    // red
+        public static readonly Color Gpu = ColorHelper.FromArgb(255, 58, 134, 255);   // blue
+        public static readonly Color Ram = ColorHelper.FromArgb(255, 236, 236, 242);  // white
+        public static readonly Color Fps = ColorHelper.FromArgb(255, 255, 183, 3);    // amber
     }
 }
